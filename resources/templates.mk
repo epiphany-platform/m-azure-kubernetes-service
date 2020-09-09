@@ -1,24 +1,28 @@
 define M_METADATA_CONTENT
 labels:
   version: $(M_VERSION)
-  name: Azure Basic Infrastructure
+  name: Azure Kubernetes Service
   short: $(M_MODULE_SHORT)
   kind: infrastructure
   provider: azure
-  provides-vms: true
-  provides-pubips: true
 endef
 
 define M_CONFIG_CONTENT
 kind: $(M_MODULE_SHORT)-config
 $(M_MODULE_SHORT):
-  size: $(M_VMS_COUNT)
-  use_public_ip: $(M_PUBLIC_IPS)
-  location: "$(M_LOCATION)"
-  name: "$(M_NAME)"
-  address_space: ["10.0.0.0/16"]
-  address_prefixes: ["10.0.1.0/24"]
+  name: $(M_NAME)
+  resource_group: $(M_RESOURCE_GROUP)
+  vnet: $(M_VNET)
+  address_prefix: $(M_ADDRESS_PREFIX)
   rsa_pub_path: "$(M_SHARED)/$(M_VMS_RSA).pub"
+
+  # default node pool
+  size: $(M_SIZE)
+  min: $(M_MIN)
+  max: $(M_MAX)
+  vm_size: $(M_VM_SIZE)
+  disk_size: $(M_DISK_SIZE)
+  auto_scaling: $(M_AUTO_SCALING)
 endef
 
 define M_STATE_INITIAL
