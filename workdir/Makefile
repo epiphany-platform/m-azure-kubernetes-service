@@ -6,7 +6,7 @@ export
 
 #medatada method is printing static metadata information about module
 metadata: guard-M_RESOURCES
-	#AzBI | metadata | should print component metadata
+	#AzKS | metadata | should print component metadata
 	@echo "$$M_METADATA_CONTENT"
 
 #init method is used to initialize module configuration and check if state is providing strong (and weak) dependencies
@@ -22,7 +22,7 @@ apply: guard-M_RESOURCES guard-M_SHARED setup module-plan terraform-apply update
 #audit method should call logic to check if remote components are in "known" state
 #TODO implement validation if remote resources are as expected, possibly with terraform plan
 audit:
-	#AzBI | audit | should output current state of remote components
+	#AzKS | audit | should output current state of remote components
 
 destroy: template-tfvars terraform-destroy update-state-after-destroy
 
@@ -32,7 +32,7 @@ output: terraform-output
 
 #TODO consider parsing terraform plan output
 terraform-plan:
-	#AzBI | terraform-plan | will run plan
+	#AzKS | terraform-plan | will run plan
 	@cd $(M_RESOURCES)/terraform ; \
 	TF_IN_AUTOMATION=true \
 	ARM_CLIENT_ID=$(M_ARM_CLIENT_ID) \
@@ -48,7 +48,7 @@ terraform-plan:
 		$(M_RESOURCES)/terraform
 
 terraform-plan-json:
-	#AzBI | terraform-plan-json | will show plan in json
+	#AzKS | terraform-plan-json | will show plan in json
 	@cd $(M_RESOURCES)/terraform ; \
 	TF_IN_AUTOMATION=true \
 		terraform show \
@@ -57,7 +57,7 @@ terraform-plan-json:
 		$(M_SHARED)/$(M_MODULE_SHORT)/terraform-apply.tfplan
 
 terraform-apply:
-	#AzBI | terraform-apply | will run terraform apply
+	#AzKS | terraform-apply | will run terraform apply
 	@cd $(M_RESOURCES)/terraform ; \
 	TF_IN_AUTOMATION=true \
 	ARM_CLIENT_ID=$(M_ARM_CLIENT_ID) \
@@ -72,7 +72,7 @@ terraform-apply:
 		$(M_SHARED)/$(M_MODULE_SHORT)/terraform-apply.tfplan
 
 terraform-plan-destroy:
-	#AzBI | terraform-plan-destroy | will prepare plan of destruction
+	#AzKS | terraform-plan-destroy | will prepare plan of destruction
 	@cd $(M_RESOURCES)/terraform ; \
 	TF_IN_AUTOMATION=true \
 	ARM_CLIENT_ID=$(M_ARM_CLIENT_ID) \
@@ -89,7 +89,7 @@ terraform-plan-destroy:
 		$(M_RESOURCES)/terraform
 
 terraform-destroy:
-	#AzBI | terraform-destroy | will destroy using plan of destruction
+	#AzKS | terraform-destroy | terraform-destroy is just about to begin ...
 	@cd $(M_RESOURCES)/terraform ; \
 	TF_IN_AUTOMATION=true \
 	TF_WARN_OUTPUT_ERRORS=1 \
@@ -105,7 +105,7 @@ terraform-destroy:
 		$(M_SHARED)/$(M_MODULE_SHORT)/terraform-destroy.tfplan
 
 terraform-output:
-	#AzBI | terraform-output | will prepare terraform output
+	#AzKS | terraform-output | will prepare terraform output
 	@cd $(M_RESOURCES)/terraform ; \
 	TF_IN_AUTOMATION=true \
 		terraform output \
@@ -118,32 +118,32 @@ terraform-output:
 	@rm $(M_SHARED)/$(M_MODULE_SHORT)/output.tmp.json $(M_SHARED)/$(M_MODULE_SHORT)/output.tmp.yml
 
 setup: $(M_SHARED)/$(M_MODULE_SHORT)
-	#AzBI | setup | ensure required directories
+	#AzKS | setup | ensure required directories
 
 template-tfvars:
-	#AzBI | template-tfvars | will template .tfvars.json file
+	#AzKS | template-tfvars | will template .tfvars.json file
 	@yq read -jP $(M_SHARED)/$(M_MODULE_SHORT)/$(M_CONFIG_NAME) '$(M_MODULE_SHORT)*' > $(M_RESOURCES)/terraform/vars.tfvars.json
 
 template-config-file:
-	#AzBI | template-config-file | will template config file (and backup previous if exists)
+	#AzKS | template-config-file | will template config file (and backup previous if exists)
 	@if test -f $(M_SHARED)/$(M_MODULE_SHORT)/$(M_CONFIG_NAME); then mv $(M_SHARED)/$(M_MODULE_SHORT)/$(M_CONFIG_NAME) $(M_SHARED)/$(M_MODULE_SHORT)/$(M_CONFIG_NAME).backup ; fi
 	@echo "$$M_CONFIG_CONTENT" > $(M_SHARED)/$(M_MODULE_SHORT)/$(M_CONFIG_NAME)
 
 display-config-file:
-	#AzBI | display-config-file | config file content is:
+	#AzKS | display-config-file | config file content is:
 	@cat $(M_SHARED)/$(M_MODULE_SHORT)/$(M_CONFIG_NAME)
 
 ensure-state-file: $(M_SHARED)/$(M_STATE_FILE_NAME)
-	#AzBI | ensure-state-file | checks if state file exists
+	#AzKS | ensure-state-file | checks if state file exists
 
 initialize-state-file:
-	#AzBI | initialize-state-file | will initialize state file
+	#AzKS | initialize-state-file | will initialize state file
 	@echo "$$M_STATE_INITIAL" > $(M_SHARED)/$(M_MODULE_SHORT)/azbi-state.tmp
 	@yq m -i -x $(M_SHARED)/$(M_STATE_FILE_NAME) $(M_SHARED)/$(M_MODULE_SHORT)/azbi-state.tmp
 	@rm $(M_SHARED)/$(M_MODULE_SHORT)/azbi-state.tmp
 
 update-state-after-apply:
-	#AzBI | update-state-after-apply | will update state file after apply
+	#AzKS | update-state-after-apply | will update state file after apply
 	@cp $(M_SHARED)/$(M_MODULE_SHORT)/$(M_CONFIG_NAME) $(M_SHARED)/$(M_MODULE_SHORT)/azbi-config.tmp.yml
 	@yq d -i $(M_SHARED)/$(M_MODULE_SHORT)/azbi-config.tmp.yml kind
 	@yq m -x -i $(M_SHARED)/$(M_STATE_FILE_NAME) $(M_SHARED)/$(M_MODULE_SHORT)/azbi-config.tmp.yml
@@ -151,31 +151,41 @@ update-state-after-apply:
 	@rm $(M_SHARED)/$(M_MODULE_SHORT)/azbi-config.tmp.yml
 
 update-state-after-destroy:
-	#AzBI | update-state-after-destroy | will clean state file after destroy
+	#AzKS | update-state-after-destroy | will clean state file after destroy
 	@yq d -i $(M_SHARED)/$(M_STATE_FILE_NAME) '$(M_MODULE_SHORT)'
 	@yq w -i $(M_SHARED)/$(M_STATE_FILE_NAME) $(M_MODULE_SHORT).status destroyed
 
 #TODO check if there is state file
 #TODO check if there is config
 assert-init-completed:
-	#AzBI | assert-init-completed | will check if all initialization steps are completed
+	#AzKS | assert-init-completed | will check if all initialization steps are completed
 
 #TODO validate if config is correct
 #TODO consider https://github.com/santhosh-tekuri/jsonschema as it's small
 validate-config:
-	#AzBI | validate-config | will perform config validation
+	#AzKS | validate-config | will perform config validation
 
 #TODO validate if state file is correct
 #TODO consider https://github.com/santhosh-tekuri/jsonschema as it's small
 validate-state:
-	#AzBI | validate-state | will perform state file validation
+	#AzKS | validate-state | will perform state file validation
 
 module-plan:
-	#AzBI | module-plan | will perform module plan
+	#AzKS | module-plan | will perform module plan
 	@yq m -x $(M_SHARED)/$(M_STATE_FILE_NAME) $(M_SHARED)/$(M_MODULE_SHORT)/$(M_CONFIG_NAME) > $(M_SHARED)/$(M_MODULE_SHORT)/azbi-future-state.tmp
 	@yq w -i $(M_SHARED)/$(M_MODULE_SHORT)/azbi-future-state.tmp kind state
 	@- yq compare $(M_SHARED)/$(M_STATE_FILE_NAME) $(M_SHARED)/$(M_MODULE_SHORT)/azbi-future-state.tmp
 	@rm $(M_SHARED)/$(M_MODULE_SHORT)/azbi-future-state.tmp
+
+get-kubeconfig:
+	@mkdir -p $(dir $@)
+	@TF_DATA_DIR=$(M_SHARED)/.terraform \
+	TF_IN_AUTOMATION=true \
+		terraform output \
+		-state=$(M_SHARED)/terraform.tfstate \
+		-no-color \
+		kubeconfig \
+		> $(M_SHARED)/kubeconfig
 
 guard-%:
 	@if [ "${${*}}" = "" ]; then \

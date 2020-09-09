@@ -1,9 +1,9 @@
 ROOT_DIR := $(patsubst %/,%,$(dir $(abspath $(firstword $(MAKEFILE_LIST)))))
 
-AZBI := epiphany/azbi:0.0.1
+AZKS := epiphany/azks:0.0.1
 
 #makes it easier to replace the value
-M_NAME ?= mkyc-module-tests
+M_NAME ?= mop-module-tests
 
 VMS_RSA_FILENAME = vms_rsa
 
@@ -21,7 +21,7 @@ clean:
 init: setup
 	@docker run --rm \
 		-v $(ROOT_DIR)/shared:/shared \
-		-t $(AZBI) \
+		-t $(AZKS) \
 		init \
 		M_VMS_COUNT=2 \
 		M_PUBLIC_IPS=false \
@@ -31,7 +31,7 @@ init: setup
 plan: setup
 	@docker run --rm \
 		-v $(ROOT_DIR)/shared:/shared \
-		-t $(AZBI) \
+		-t $(AZKS) \
 		plan \
 		M_ARM_CLIENT_ID=$$ARM_CLIENT_ID \
 		M_ARM_CLIENT_SECRET=$$ARM_CLIENT_SECRET \
@@ -41,17 +41,18 @@ plan: setup
 apply: setup
 	@docker run --rm \
 		-v $(ROOT_DIR)/shared:/shared \
-		-t $(AZBI) \
+		-t $(AZKS) \
 		apply \
 		M_ARM_CLIENT_ID=$$ARM_CLIENT_ID \
 		M_ARM_CLIENT_SECRET=$$ARM_CLIENT_SECRET \
 		M_ARM_SUBSCRIPTION_ID=$$ARM_SUBSCRIPTION_ID \
-		M_ARM_TENANT_ID=$$ARM_TENANT_ID
+		M_ARM_TENANT_ID=$$ARM_TENANT_ID \
+		get-kubeconfig
 
 output: setup
 	@docker run --rm \
 		-v $(ROOT_DIR)/shared:/shared \
-		-t $(AZBI) \
+		-t $(AZKS) \
 		output \
 		M_ARM_CLIENT_ID=$$ARM_CLIENT_ID \
 		M_ARM_CLIENT_SECRET=$$ARM_CLIENT_SECRET \
@@ -61,7 +62,7 @@ output: setup
 destroy-plan: setup
 	@docker run --rm \
 		-v $(ROOT_DIR)/shared:/shared \
-		-t $(AZBI) \
+		-t $(AZKS) \
 		plan-destroy \
 		M_ARM_CLIENT_ID=$$ARM_CLIENT_ID \
 		M_ARM_CLIENT_SECRET=$$ARM_CLIENT_SECRET \
@@ -71,7 +72,7 @@ destroy-plan: setup
 destroy: setup
 	@docker run --rm \
 		-v $(ROOT_DIR)/shared:/shared \
-		-t $(AZBI) \
+		-t $(AZKS) \
 		destroy \
 		M_ARM_CLIENT_ID=$$ARM_CLIENT_ID \
 		M_ARM_CLIENT_SECRET=$$ARM_CLIENT_SECRET \

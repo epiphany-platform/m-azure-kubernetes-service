@@ -1,6 +1,6 @@
 VERSION := 0.0.1
 USER := epiphany
-IMAGE := azbi
+IMAGE := azks
 
 #used for correctly setting shared folder permissions
 HOST_UID := $(shell id -u)
