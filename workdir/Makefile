@@ -177,15 +177,9 @@ module-plan:
 	@- yq compare $(M_SHARED)/$(M_STATE_FILE_NAME) $(M_SHARED)/$(M_MODULE_SHORT)/azbi-future-state.tmp
 	@rm $(M_SHARED)/$(M_MODULE_SHORT)/azbi-future-state.tmp
 
-get-kubeconfig:
-	@mkdir -p $(dir $@)
-	@TF_DATA_DIR=$(M_SHARED)/.terraform \
-	TF_IN_AUTOMATION=true \
-		terraform output \
-		-state=$(M_SHARED)/terraform.tfstate \
-		-no-color \
-		kubeconfig \
-		> $(M_SHARED)/kubeconfig
+kubeconfig:
+	#AzKS | kubeconfig | will store kubeconfig in a file
+	@yq r $(M_SHARED)/$(M_STATE_FILE_NAME) azks.output.kubeconfig.value > $(M_SHARED)/kubeconfig
 
 guard-%:
 	@if [ "${${*}}" = "" ]; then \
