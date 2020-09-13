@@ -8,7 +8,7 @@ data "azurerm_virtual_network" "vnet" {
 }
 
 resource "azurerm_subnet" "subnet" {
-  name                 = "${var.name}-subnet-aks"
+  name                 = "${var.name}-snet-aks"
   resource_group_name  = data.azurerm_resource_group.main_rg.name
   virtual_network_name = data.azurerm_virtual_network.vnet.name
   address_prefixes     = [ var.address_prefix ]
