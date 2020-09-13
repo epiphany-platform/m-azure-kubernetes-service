@@ -1,3 +1,4 @@
 output "kubeconfig" {
-  value = module.aks.kubeconfig
+  value     = module.aks.kubeconfig
+  sensitive = true
 }
