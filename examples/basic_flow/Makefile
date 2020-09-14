@@ -1,5 +1,3 @@
-ROOT_DIR := $(patsubst %/,%,$(dir $(abspath $(firstword $(MAKEFILE_LIST)))))
-
 AZBI := epiphany/azbi:0.0.1
 AZKS := epiphany/azks:0.0.1
 
@@ -7,9 +5,9 @@ AZKS := epiphany/azks:0.0.1
 M_NAME            ?= mop-module-tests
 M_SHARED_EXTERNAL ?= /tmp/$(M_NAME)/shared
 
-VMS_RSA_FILENAME = vms_rsa
+VMS_RSA_FILENAME ?= vms_rsa
 
--include $(ROOT_DIR)/azure.mk
+-include ./azure.mk
 
 export
 
