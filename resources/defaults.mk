@@ -2,7 +2,7 @@ M_NAME ?= epiphany
 M_VMS_RSA ?= vms_rsa
 M_RESOURCE_GROUP ?= $(M_NAME)-rg
 M_VNET ?= $(M_NAME)-vnet
-M_ADDRESS_PREFIX ?= 10.0.16.0/24
+M_ADDRESS_PREFIX ?= 10.0.0.0/16
 
 # default node pool
 M_SIZE ?= 2

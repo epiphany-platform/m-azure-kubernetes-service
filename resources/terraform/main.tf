@@ -11,7 +11,7 @@ resource "azurerm_subnet" "subnet" {
   name                 = "${var.name}-snet-aks"
   resource_group_name  = data.azurerm_resource_group.main_rg.name
   virtual_network_name = data.azurerm_virtual_network.vnet.name
-  address_prefixes     = [ var.address_prefix ]
+  address_prefixes     = [ cidrsubnet(var.address_prefix, 8, 16) ]
 }
 
 module "aks" {
