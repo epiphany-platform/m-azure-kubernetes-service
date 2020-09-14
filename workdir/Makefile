@@ -186,7 +186,7 @@ module-plan:
 
 kubeconfig:
 	#AzKS | kubeconfig | will store kubeconfig in a file
-	@yq r $(M_SHARED)/$(M_STATE_FILE_NAME) azks.output.kubeconfig.value > $(M_SHARED)/kubeconfig
+	@yq r $(M_SHARED)/$(M_STATE_FILE_NAME) 'azks.output[kubeconfig.value]' > $(M_SHARED)/kubeconfig
 
 guard-%:
 	@if [ "${${*}}" = "" ]; then \
