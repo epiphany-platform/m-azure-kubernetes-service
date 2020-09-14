@@ -3,13 +3,13 @@ variable "name" {
   type        = string
 }
 
-variable "resource_group" {
+variable "rg_name" {
   description = "Name of an resource group to deploy AKS cluster in"
   type        = string
   default     = ""
 }
 
-variable "vnet" {
+variable "vnet_name" {
   description = "Main Virtual Network's name"
   type        = string
 }

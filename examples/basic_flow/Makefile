@@ -1,9 +1,11 @@
 ROOT_DIR := $(patsubst %/,%,$(dir $(abspath $(firstword $(MAKEFILE_LIST)))))
 
+AZBI := epiphany/azbi:0.0.1
 AZKS := epiphany/azks:0.0.1
 
 #makes it easier to replace the value
-M_NAME ?= mop-module-tests
+M_NAME            ?= mop-module-tests
+M_SHARED_EXTERNAL ?= /tmp/$(M_NAME)/shared
 
 VMS_RSA_FILENAME = vms_rsa
 
@@ -11,16 +13,85 @@ VMS_RSA_FILENAME = vms_rsa
 
 export
 
-.PHONY: all clean init plan apply output destroy-plan destroy setup
+.PHONY: all apply destroy clean setup
 
-all: init plan apply
+all: apply
+
+apply: init-azbi plan-azbi apply-azbi \
+       init-azks plan-azks apply-azks
+
+destroy: destroy-plan-azks destroy-azks \
+         destroy-plan-azbi destroy-azbi
 
 clean:
-	@rm -rf $(ROOT_DIR)/shared #TODO change root_dir to external dir
+	@rm -rf $(M_SHARED_EXTERNAL)
 
-init: setup
+.PHONY: init-azbi plan-azbi apply-azbi output-azbi destroy-plan-azbi destroy-azbi
+
+init-azbi: setup
 	@docker run --rm \
-		-v $(ROOT_DIR)/shared:/shared \
+		-v $(M_SHARED_EXTERNAL):/shared \
+		-t $(AZBI) \
+		init \
+		M_VMS_COUNT=2 \
+		M_PUBLIC_IPS=false \
+		M_NAME=$(M_NAME)
+
+plan-azbi: setup
+	@docker run --rm \
+		-v $(M_SHARED_EXTERNAL):/shared \
+		-t $(AZBI) \
+		plan \
+		M_ARM_CLIENT_ID=$$ARM_CLIENT_ID \
+		M_ARM_CLIENT_SECRET=$$ARM_CLIENT_SECRET \
+		M_ARM_SUBSCRIPTION_ID=$$ARM_SUBSCRIPTION_ID \
+		M_ARM_TENANT_ID=$$ARM_TENANT_ID
+
+apply-azbi: setup
+	@docker run --rm \
+		-v $(M_SHARED_EXTERNAL):/shared \
+		-t $(AZBI) \
+		apply \
+		M_ARM_CLIENT_ID=$$ARM_CLIENT_ID \
+		M_ARM_CLIENT_SECRET=$$ARM_CLIENT_SECRET \
+		M_ARM_SUBSCRIPTION_ID=$$ARM_SUBSCRIPTION_ID \
+		M_ARM_TENANT_ID=$$ARM_TENANT_ID
+
+output-azbi: setup
+	@docker run --rm \
+		-v $(M_SHARED_EXTERNAL):/shared \
+		-t $(AZBI) \
+		output \
+		M_ARM_CLIENT_ID=$$ARM_CLIENT_ID \
+		M_ARM_CLIENT_SECRET=$$ARM_CLIENT_SECRET \
+		M_ARM_SUBSCRIPTION_ID=$$ARM_SUBSCRIPTION_ID \
+		M_ARM_TENANT_ID=$$ARM_TENANT_ID
+
+destroy-plan-azbi: setup
+	@docker run --rm \
+		-v $(M_SHARED_EXTERNAL):/shared \
+		-t $(AZBI) \
+		plan-destroy \
+		M_ARM_CLIENT_ID=$$ARM_CLIENT_ID \
+		M_ARM_CLIENT_SECRET=$$ARM_CLIENT_SECRET \
+		M_ARM_SUBSCRIPTION_ID=$$ARM_SUBSCRIPTION_ID \
+		M_ARM_TENANT_ID=$$ARM_TENANT_ID
+
+destroy-azbi: setup
+	@docker run --rm \
+		-v $(M_SHARED_EXTERNAL):/shared \
+		-t $(AZBI) \
+		destroy \
+		M_ARM_CLIENT_ID=$$ARM_CLIENT_ID \
+		M_ARM_CLIENT_SECRET=$$ARM_CLIENT_SECRET \
+		M_ARM_SUBSCRIPTION_ID=$$ARM_SUBSCRIPTION_ID \
+		M_ARM_TENANT_ID=$$ARM_TENANT_ID
+
+.PHONY: init-azks plan-azks apply-azks output-azks destroy-plan-azks destroy-azks
+
+init-azks: setup
+	@docker run --rm \
+		-v $(M_SHARED_EXTERNAL):/shared \
 		-t $(AZKS) \
 		init \
 		M_VMS_COUNT=2 \
@@ -28,9 +99,9 @@ init: setup
 		M_NAME=$(M_NAME) \
 		M_VMS_RSA=$(VMS_RSA_FILENAME)
 
-plan: setup
+plan-azks: setup
 	@docker run --rm \
-		-v $(ROOT_DIR)/shared:/shared \
+		-v $(M_SHARED_EXTERNAL):/shared \
 		-t $(AZKS) \
 		plan \
 		M_ARM_CLIENT_ID=$$ARM_CLIENT_ID \
@@ -38,9 +109,9 @@ plan: setup
 		M_ARM_SUBSCRIPTION_ID=$$ARM_SUBSCRIPTION_ID \
 		M_ARM_TENANT_ID=$$ARM_TENANT_ID
 
-apply: setup
+apply-azks: setup
 	@docker run --rm \
-		-v $(ROOT_DIR)/shared:/shared \
+		-v $(M_SHARED_EXTERNAL):/shared \
 		-t $(AZKS) \
 		apply \
 		M_ARM_CLIENT_ID=$$ARM_CLIENT_ID \
@@ -49,9 +120,9 @@ apply: setup
 		M_ARM_TENANT_ID=$$ARM_TENANT_ID \
 		kubeconfig
 
-output: setup
+output-azks: setup
 	@docker run --rm \
-		-v $(ROOT_DIR)/shared:/shared \
+		-v $(M_SHARED_EXTERNAL):/shared \
 		-t $(AZKS) \
 		output \
 		M_ARM_CLIENT_ID=$$ARM_CLIENT_ID \
@@ -59,9 +130,9 @@ output: setup
 		M_ARM_SUBSCRIPTION_ID=$$ARM_SUBSCRIPTION_ID \
 		M_ARM_TENANT_ID=$$ARM_TENANT_ID
 
-destroy-plan: setup
+destroy-plan-azks: setup
 	@docker run --rm \
-		-v $(ROOT_DIR)/shared:/shared \
+		-v $(M_SHARED_EXTERNAL):/shared \
 		-t $(AZKS) \
 		plan-destroy \
 		M_ARM_CLIENT_ID=$$ARM_CLIENT_ID \
@@ -69,9 +140,9 @@ destroy-plan: setup
 		M_ARM_SUBSCRIPTION_ID=$$ARM_SUBSCRIPTION_ID \
 		M_ARM_TENANT_ID=$$ARM_TENANT_ID
 
-destroy: setup
+destroy-azks: setup
 	@docker run --rm \
-		-v $(ROOT_DIR)/shared:/shared \
+		-v $(M_SHARED_EXTERNAL):/shared \
 		-t $(AZKS) \
 		destroy \
 		M_ARM_CLIENT_ID=$$ARM_CLIENT_ID \
@@ -79,8 +150,8 @@ destroy: setup
 		M_ARM_SUBSCRIPTION_ID=$$ARM_SUBSCRIPTION_ID \
 		M_ARM_TENANT_ID=$$ARM_TENANT_ID
 
-setup: $(ROOT_DIR)/shared/$(VMS_RSA_FILENAME)
+setup: $(M_SHARED_EXTERNAL)/$(VMS_RSA_FILENAME)
 
-$(ROOT_DIR)/shared/$(VMS_RSA_FILENAME):
+$(M_SHARED_EXTERNAL)/$(VMS_RSA_FILENAME):
 	@mkdir -p $(dir $@)
 	@ssh-keygen -t rsa -b 4096 -f $@ -N '' 2>&1 >/dev/null

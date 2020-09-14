@@ -3,7 +3,7 @@ variable "name" {
   type        = string
 }
 
-variable "resource_group" {
+variable "rg_name" {
   description = "Name of an resource group to put AKS cluster in"
   type        = string
 }
