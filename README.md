@@ -14,7 +14,7 @@ az ad sp create-for-rbac --role="Contributor" --scopes="/subscriptions/SUBSCRIPT
 
 # Build image
 
-In main directory run: 
+In main directory run:
 ```
 make build
 ```
