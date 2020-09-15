@@ -14,7 +14,7 @@ az ad sp create-for-rbac --role="Contributor" --scopes="/subscriptions/SUBSCRIPT
 
 # Build image
 
-In main directory run: 
+In main directory run:
 ```
 make build
 ```
@@ -37,4 +37,16 @@ ARM_SUBSCRIPTION_ID ?= "id field"
 ARM_TENANT_ID ?= "tenant field"
 EOF
 make all
+```
+
+# Release module
+
+```
+make release
+```
+
+or if you want to set different version number:
+
+```
+make release VERSION=number_of_your_choice
 ```
