@@ -38,3 +38,15 @@ ARM_TENANT_ID ?= "tenant field"
 EOF
 make all
 ```
+
+# Release module
+
+```
+make release
+```
+
+or if you want to set different version number:
+
+```
+make release VERSION=number_of_your_choice
+```
