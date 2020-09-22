@@ -5,3 +5,6 @@
 **/shared/
 **/.terraform/
 **/vars.tfvars.json
+/service-principal.mk
+/tests/tests.out
+/tests/repot.xml

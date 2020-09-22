@@ -11,7 +11,7 @@ VMS_RSA_FILENAME ?= vms_rsa
 
 export
 
-.PHONY: all apply destroy clean setup
+.PHONY: all apply destroy clean metadata setup
 
 all: apply
 
@@ -23,6 +23,11 @@ destroy: destroy-plan-azks destroy-azks \
 
 clean:
 	@rm -rf $(M_SHARED_EXTERNAL)
+
+metadata: guard-VERSION guard-IMAGE guard-USER
+	@docker run --rm \
+		-t $(USER)/$(IMAGE):$(VERSION) \
+		metadata
 
 .PHONY: init-azbi plan-azbi apply-azbi output-azbi destroy-plan-azbi destroy-azbi
 
