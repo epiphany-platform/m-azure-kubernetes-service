@@ -7,7 +7,12 @@ test-default-config:
 	#finished default config tests
 
 test-config-with-variables:
-	# tests of config with variables will go here
+	#will run config with variables tests
+	@bash tests/tests.sh cleanup
+	@bash tests/tests.sh setup
+	@bash tests/tests.sh test-config-with-variables-suite $(IMAGE_NAME)
+	@bash tests/tests.sh cleanup
+	#finished config with variables tests
 
 test-plan:
 	# tests of plan operation will go here

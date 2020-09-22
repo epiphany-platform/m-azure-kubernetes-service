@@ -1,0 +1,15 @@
+kind: azks-config
+azks:
+  name: azks-module-tests
+  rg_name: azks-module-tests-rg
+  vnet_name: azks-module-tests-vnet
+  address_prefix: 10.0.0.1/16
+
+  # default node pool
+  size: 2
+  min: 2
+  max: 5
+  vm_size: Standard_DS2_v2
+  disk_size: 40
+  auto_scaling: true
+  rsa_pub_path: "/shared/test_vms_rsa.pub"
