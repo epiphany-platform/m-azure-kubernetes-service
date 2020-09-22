@@ -7,6 +7,7 @@ function usage() {
     $0 generate_junit_report
     $0 test-default-config-suite [image_name]
     $0 test-config-with-variables-suite [image_name]
+    $0 test-plan-suite [image_name] [ARM_CLIENT_ID] [ARM_CLIENT_SECRET] [ARM_SUBSCRIPTION_ID] [ARM_TENANT_ID]
     "
 }
 
@@ -34,6 +35,31 @@ function test-config-with-variables-suite() {
   r=$?
 
   stop_suite test-config-with-variables "$r"
+}
+
+function test-plan-suite() {
+  #$1 is IMAGE_NAME
+  #$2 is ARM_CLIENT_ID
+  #$3 is ARM_CLIENT_SECRET
+  #$4 is ARM_SUBSCRIPTION_ID
+  #$5 is ARM_TENANT_ID
+  start_suite test-plan
+
+  r=0
+  run_test init-2-machines-no-public-ips-named "$r" "$1"
+  r=$?
+  run_test check-2-machines-no-public-ips-named-rsa-config-content "$r" "$1"
+  r=$?
+  run_test prepare-azks-module-tests-rg "$r" "$1 $2 $3 $4 $5"
+  r=$?
+  run_test plan-2-machines-no-public-ips-named "$r" "$1 $2 $3 $4 $5"
+  r=$?
+  run_test check-2-machines-no-public-ips-named-rsa-plan "$r" "$1"
+  r=$?
+  run_test teardown-azks-module-tests-rg "$r" "$1 $2 $3 $4 $5"
+  r=$?
+
+  stop_suite test-plan "$r"
 }
 
 function init-default-config() {
@@ -79,6 +105,48 @@ function check-2-machines-no-public-ips-named-rsa-config-content() {
   cmp -b "$TESTS_DIR"/shared/azks/azks-config.yml "$TESTS_DIR"/mocks/config-with-variables/config.yml
 }
 
+function prepare-azks-module-tests-rg() {
+  echo "#	will do az login"
+  az login --service-principal --username "$2" --password "$3" --tenant "$5" -o none
+  echo "#	will create resource group azks-module-tests-rg"
+  az group create --subscription "$4" --location germanywestcentral --name azks-module-tests-rg
+  echo "#	will create vnet azks-module-tests-vnet"
+  az network vnet create --subscription "$4" --resource-group azks-module-tests-rg --name azks-module-tests-vnet
+}
+
+function plan-2-machines-no-public-ips-named() {
+  echo "#	will plan with \"docker run ... plan M_ARM_CLIENT_ID=... M_ARM_CLIENT_SECRET=... M_ARM_SUBSCRIPTION_ID=... M_ARM_TENANT_ID=...\""
+  docker run --rm \
+    -v "$TESTS_DIR"/shared:/shared \
+    -t "$1" \
+    plan \
+    M_ARM_CLIENT_ID="$2" \
+    M_ARM_CLIENT_SECRET="$3" \
+    M_ARM_SUBSCRIPTION_ID="$4" \
+    M_ARM_TENANT_ID="$5"
+}
+
+function check-2-machines-no-public-ips-named-rsa-plan() {
+  echo "#	will test if file ./shared/state.yml exists"
+  if ! test -f "$TESTS_DIR"/shared/state.yml; then exit 1; fi
+  echo "#	will test if file ./shared/state.yml has expected content"
+  cmp -b "$TESTS_DIR"/shared/state.yml "$TESTS_DIR"/mocks/plan/state.yml
+  echo "#	will test if file ./shared/azks/terraform-apply.tfplan exists"
+  if ! test -f "$TESTS_DIR"/shared/azks/terraform-apply.tfplan; then exit 1; fi
+  echo "#	will test if file ./shared/azks/terraform-apply.tfplan size is greater than 0"
+  filesize=$(du "$TESTS_DIR"/shared/azks/terraform-apply.tfplan | cut -f1)
+  if [[ ! $filesize -gt 0 ]]; then exit 1; fi
+}
+
+function teardown-azks-module-tests-rg() {
+  echo "#	will do az login"
+  az login --service-principal --username "$2" --password "$3" --tenant "$5" -o none
+  echo "#	will delete vnet azks-module-tests-vnet"
+  az network vnet delete --subscription "$4" --resource-group azks-module-tests-rg --name azks-module-tests-vnet
+  echo "#	will delete resource group azks-module-tests-rg"
+  az group delete --subscription "$4" --name azks-module-tests-rg --yes
+}
+
 TESTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 
 # shellcheck disable=SC1090
@@ -98,6 +166,13 @@ test-config-with-variables-suite)
     exit 1
   fi
   test-config-with-variables-suite "$2"
+  ;;
+test-plan-suite)
+  if [[ $# -ne 6 ]]; then
+    usage
+    exit 1
+  fi
+  test-plan-suite "$2" "$3" "$4" "$5" "$6"
   ;;
 cleanup)
   if [[ $# -ne 1 ]]; then

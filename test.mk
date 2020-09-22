@@ -15,7 +15,12 @@ test-config-with-variables:
 	#finished config with variables tests
 
 test-plan:
-	# tests of plan operation will go here
+	#will run plan tests
+	@bash tests/tests.sh cleanup
+	@bash tests/tests.sh setup
+	@bash tests/tests.sh test-plan-suite $(IMAGE_NAME) $(ARM_CLIENT_ID) $(ARM_CLIENT_SECRET) $(ARM_SUBSCRIPTION_ID) $(ARM_TENANT_ID)
+	@bash tests/tests.sh cleanup
+	#finished plan tests
 
 test-apply:
 	# tests of apply operation will go here
