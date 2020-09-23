@@ -1,11 +1,10 @@
-kind: azks-config
+kind: state
 azks:
+  status: applied
   name: azks-module-tests
   rg_name: azks-module-tests-rg
   vnet_name: azks-module-tests-vnet
-  address_prefix: 10.0.0.0/16
-
-  # default node pool
+  address_prefix: 10.0.0.1/16
   size: 2
   min: 2
   max: 5

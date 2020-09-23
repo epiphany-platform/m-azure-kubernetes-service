@@ -29,9 +29,9 @@ function test-config-with-variables-suite() {
   start_suite test-config-with-variables
 
   r=0
-  run_test init-2-machines-no-public-ips-named "$r" "$1"
+  run_test init-2-5-autoscaled-aks "$r" "$1"
   r=$?
-  run_test check-2-machines-no-public-ips-named-rsa-config-content "$r" "$1"
+  run_test check-2-5-autoscaled-aks-config-content "$r" "$1"
   r=$?
 
   stop_suite test-config-with-variables "$r"
@@ -46,16 +46,49 @@ function test-plan-suite() {
   start_suite test-plan
 
   r=0
-  run_test init-2-machines-no-public-ips-named "$r" "$1"
+  run_test init-2-5-autoscaled-aks "$r" "$1"
   r=$?
-  run_test check-2-machines-no-public-ips-named-rsa-config-content "$r" "$1"
+  run_test check-2-5-autoscaled-aks-config-content "$r" "$1"
   r=$?
   run_test prepare-azks-module-tests-rg "$r" "$1 $2 $3 $4 $5"
   r=$?
-  run_test plan-2-machines-no-public-ips-named "$r" "$1 $2 $3 $4 $5"
+  run_test plan-2-5-autoscaled-aks "$r" "$1 $2 $3 $4 $5"
   r=$?
-  run_test check-2-machines-no-public-ips-named-rsa-plan "$r" "$1"
+  run_test check-2-5-autoscaled-aks-plan "$r" "$1"
+  r=0
+  run_test teardown-azks-module-tests-rg "$r" "$1 $2 $3 $4 $5"
   r=$?
+
+  stop_suite test-plan "$r"
+}
+
+function test-apply-suite() {
+  #$1 is IMAGE_NAME
+  #$2 is ARM_CLIENT_ID
+  #$3 is ARM_CLIENT_SECRET
+  #$4 is ARM_SUBSCRIPTION_ID
+  #$5 is ARM_TENANT_ID
+  start_suite test-plan
+
+  r=0
+  run_test init-2-5-autoscaled-aks "$r" "$1"
+  r=$?
+  run_test check-2-5-autoscaled-aks-config-content "$r" "$1"
+  r=$?
+  run_test prepare-azks-module-tests-rg "$r" "$1 $2 $3 $4 $5"
+  r=$?
+  run_test plan-2-5-autoscaled-aks "$r" "$1 $2 $3 $4 $5"
+  r=$?
+  run_test check-2-5-autoscaled-aks-plan "$r" "$1"
+  r=$?
+  run_test apply-2-5-autoscaled-aks "$r" "$1 $2 $3 $4 $5"
+  r=$?
+  run_test check-2-5-autoscaled-aks-apply "$r" "$1"
+  r=$?
+  run_test validate-azure-resources-presence "$r" "$1 $2 $3 $4 $5"
+  r=0
+  run_test cleanup-after-apply "$r" "$1 $2 $3 $4 $5"
+  r=0
   run_test teardown-azks-module-tests-rg "$r" "$1 $2 $3 $4 $5"
   r=$?
 
@@ -79,7 +112,7 @@ function check-default-config-content() {
   cmp -b "$TESTS_DIR"/shared/azks/azks-config.yml "$TESTS_DIR"/mocks/default-config/config.yml
 }
 
-function init-2-machines-no-public-ips-named() {
+function init-2-5-autoscaled-aks() {
   echo "# prepare test state file"
   cp "$TESTS_DIR"/tests/mocks/config-with-variables/state.yml "$TESTS_DIR"/shared/
   echo "#	will initialize config with \"docker run ... init M_VMS_COUNT=2 M_PUBLIC_IPS=false M_NAME=azbi-module-tests M_VMS_RSA=test_vms_rsa command\""
@@ -89,7 +122,7 @@ function init-2-machines-no-public-ips-named() {
     init \
     M_NAME=azks-module-tests \
     M_VMS_RSA=test_vms_rsa \
-    M_ADDRESS_PREFIX=10.0.0.1/16 \
+    M_ADDRESS_PREFIX=10.0.0.0/16 \
     M_SIZE=2 \
     M_MIN=2 \
     M_MAX=5 \
@@ -98,7 +131,7 @@ function init-2-machines-no-public-ips-named() {
     M_AUTO_SCALING=true
 }
 
-function check-2-machines-no-public-ips-named-rsa-config-content() {
+function check-2-5-autoscaled-aks-config-content() {
   echo "#	will test if file ./shared/azks/azks-config.yml exists"
   if ! test -f "$TESTS_DIR"/shared/azks/azks-config.yml; then exit 1; fi
   echo "#	will test if file ./shared/azks/azks-config.yml has expected content"
@@ -111,10 +144,10 @@ function prepare-azks-module-tests-rg() {
   echo "#	will create resource group azks-module-tests-rg"
   az group create --subscription "$4" --location germanywestcentral --name azks-module-tests-rg
   echo "#	will create vnet azks-module-tests-vnet"
-  az network vnet create --subscription "$4" --resource-group azks-module-tests-rg --name azks-module-tests-vnet
+  az network vnet create --subscription "$4" --resource-group azks-module-tests-rg --name azks-module-tests-vnet --address-prefix 10.0.0.0/16
 }
 
-function plan-2-machines-no-public-ips-named() {
+function plan-2-5-autoscaled-aks() {
   echo "#	will plan with \"docker run ... plan M_ARM_CLIENT_ID=... M_ARM_CLIENT_SECRET=... M_ARM_SUBSCRIPTION_ID=... M_ARM_TENANT_ID=...\""
   docker run --rm \
     -v "$TESTS_DIR"/shared:/shared \
@@ -126,7 +159,7 @@ function plan-2-machines-no-public-ips-named() {
     M_ARM_TENANT_ID="$5"
 }
 
-function check-2-machines-no-public-ips-named-rsa-plan() {
+function check-2-5-autoscaled-aks-plan() {
   echo "#	will test if file ./shared/state.yml exists"
   if ! test -f "$TESTS_DIR"/shared/state.yml; then exit 1; fi
   echo "#	will test if file ./shared/state.yml has expected content"
@@ -145,6 +178,65 @@ function teardown-azks-module-tests-rg() {
   az network vnet delete --subscription "$4" --resource-group azks-module-tests-rg --name azks-module-tests-vnet
   echo "#	will delete resource group azks-module-tests-rg"
   az group delete --subscription "$4" --name azks-module-tests-rg --yes
+}
+
+function apply-2-5-autoscaled-aks() {
+  echo "#	will apply with \"docker run ... apply M_ARM_CLIENT_ID=... M_ARM_CLIENT_SECRET=... M_ARM_SUBSCRIPTION_ID=... M_ARM_TENANT_ID=...\""
+  docker run --rm \
+    -v "$TESTS_DIR"/shared:/shared \
+    -t "$1" \
+    apply \
+    M_ARM_CLIENT_ID="$2" \
+    M_ARM_CLIENT_SECRET="$3" \
+    M_ARM_SUBSCRIPTION_ID="$4" \
+    M_ARM_TENANT_ID="$5"
+}
+
+function check-2-5-autoscaled-aks-apply() {
+  echo "#	will test if file ./shared/state.yml exists"
+  if ! test -f "$TESTS_DIR"/shared/state.yml; then exit 1; fi
+  echo "#	will test if file ./shared/state.yml has expected content"
+  cmp -b "$TESTS_DIR"/shared/state.yml "$TESTS_DIR"/mocks/apply/state.yml
+  echo "#	will test if file ./shared/azks/terraform.tfstate exists"
+  if ! test -f "$TESTS_DIR"/shared/azks/terraform.tfstate; then exit 1; fi
+  echo "#	will test if file ./shared/azks/terraform.tfstate size is greater than 0"
+  filesize=$(du "$TESTS_DIR"/shared/azks/terraform.tfstate | cut -f1)
+  if [[ ! $filesize -gt 0 ]]; then exit 1; fi
+}
+
+function validate-azure-resources-presence() {
+  echo "#	will do az login"
+  az login --service-principal --username "$2" --password "$3" --tenant "$5" -o none
+  echo "#	will test if there is expected resource group in subscription"
+  group_id=$(az group show --subscription "$4" --name azks-module-tests-rg --query id)
+  if [[ -z $group_id ]]; then exit 1; fi
+  echo "#	will test if there is expected amount of machines in resource group"
+  aks_count=$(az aks list --subscription "$4" --resource-group azks-module-tests-rg -o yaml | yq r - --length)
+  if [[ $aks_count -ne 1 ]]; then
+    echo "expected 1 but got $aks_count AKSes"
+    exit 1
+  fi
+}
+
+function cleanup-after-apply() {
+  echo "#	will apply with \"docker run ... plan-destroy M_ARM_CLIENT_ID=... M_ARM_CLIENT_SECRET=... M_ARM_SUBSCRIPTION_ID=... M_ARM_TENANT_ID=...\""
+  docker run --rm \
+    -v "$TESTS_DIR"/shared:/shared \
+    -t "$1" \
+    plan-destroy \
+    M_ARM_CLIENT_ID="$2" \
+    M_ARM_CLIENT_SECRET="$3" \
+    M_ARM_SUBSCRIPTION_ID="$4" \
+    M_ARM_TENANT_ID="$5"
+  echo "#	will apply with \"docker run ... destroy M_ARM_CLIENT_ID=... M_ARM_CLIENT_SECRET=... M_ARM_SUBSCRIPTION_ID=... M_ARM_TENANT_ID=...\""
+  docker run --rm \
+    -v "$TESTS_DIR"/shared:/shared \
+    -t "$1" \
+    destroy \
+    M_ARM_CLIENT_ID="$2" \
+    M_ARM_CLIENT_SECRET="$3" \
+    M_ARM_SUBSCRIPTION_ID="$4" \
+    M_ARM_TENANT_ID="$5"
 }
 
 TESTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
@@ -173,6 +265,13 @@ test-plan-suite)
     exit 1
   fi
   test-plan-suite "$2" "$3" "$4" "$5" "$6"
+  ;;
+test-apply-suite)
+  if [[ $# -ne 6 ]]; then
+    usage
+    exit 1
+  fi
+  test-apply-suite "$2" "$3" "$4" "$5" "$6"
   ;;
 cleanup)
   if [[ $# -ne 1 ]]; then

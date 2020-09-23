@@ -23,7 +23,12 @@ test-plan:
 	#finished plan tests
 
 test-apply:
-	# tests of apply operation will go here
+	#will run apply tests
+	@bash tests/tests.sh cleanup
+	@bash tests/tests.sh setup
+	@bash tests/tests.sh test-apply-suite $(IMAGE_NAME) $(ARM_CLIENT_ID) $(ARM_CLIENT_SECRET) $(ARM_SUBSCRIPTION_ID) $(ARM_TENANT_ID)
+	@bash tests/tests.sh cleanup
+	#finished apply tests
 
 generate-report:
 	@bash tests/tests.sh generate_junit_report
