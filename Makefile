@@ -5,7 +5,6 @@ USER := epiphanyplatform
 IMAGE := azks
 
 IMAGE_NAME := $(USER)/$(IMAGE):$(VERSION)
-AZBI_IMAGE_NAME := epiphanyplatform/azbi:0.0.1
 
 define SERVICE_PRINCIPAL_CONTENT
 ARM_CLIENT_ID ?= $(CLIENT_ID)
@@ -23,7 +22,7 @@ export
 HOST_UID := $(shell id -u)
 HOST_GID := $(shell id -g)
 
-.PHONY: build test release prepare-service-principal ensure-azbi
+.PHONY: build test release prepare-service-principal
 
 build: guard-VERSION guard-IMAGE guard-USER
 	docker build \
@@ -36,7 +35,6 @@ build: guard-VERSION guard-IMAGE guard-USER
 #prepare service principal variables file before running this target using `CLIENT_ID=xxx CLIENT_SECRET=yyy SUBSCRIPTION_ID=zzz TENANT_ID=vvv make prepare-service-principal`
 #test targets are located in ./test.mk file
 test: build \
-	ensure-azbi \
 	test-default-config \
 	test-config-with-variables \
 	test-plan \
@@ -57,7 +55,3 @@ guard-%:
 		echo "Environment variable $* not set"; \
 		exit 1; \
 	fi
-
-ensure-azbi:
-	# checking if additional required image is present
-	@docker image inspect $(AZBI_IMAGE_NAME) > /dev/null
