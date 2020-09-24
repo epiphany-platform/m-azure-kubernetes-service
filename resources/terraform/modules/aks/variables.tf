@@ -91,7 +91,7 @@ variable "scale_down_utilization_threshold" {
 variable "kubernetes_version" {
   description = "Kubernetes version"
   type        = string
-  default     = "1.17.7"
+  default     = "1.18.6"
 }
 
 variable "enable_node_public_ip" {
