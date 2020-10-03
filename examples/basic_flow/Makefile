@@ -15,6 +15,8 @@ export
 
 all: apply
 
+init: init-azbi init-azks 
+
 apply: init-azbi plan-azbi apply-azbi \
        init-azks plan-azks apply-azks
 
