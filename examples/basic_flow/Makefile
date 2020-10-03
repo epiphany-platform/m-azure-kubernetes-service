@@ -1,9 +1,10 @@
 AZBI := epiphanyplatform/azbi:0.0.1
 AZKS := epiphanyplatform/azks:0.0.1
 
+makefile_dir_path := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 #makes it easier to replace the value
 M_NAME            ?= mop-module-tests
-M_SHARED_EXTERNAL ?= /tmp/$(M_NAME)/shared
+M_SHARED_EXTERNAL ?= $(makefile_dir_path)/$(M_NAME)/shared
 
 VMS_RSA_FILENAME ?= vms_rsa
 
