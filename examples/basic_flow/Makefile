@@ -1,7 +1,7 @@
 AZBI := epiphanyplatform/azbi:0.0.1
 AZKS := epiphanyplatform/azks:0.0.1
 
-makefile_dir_path := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
+makefile_dir_path := $(patsubst %/,%,$(dir $(realpath $(firstword $(MAKEFILE_LIST)))))
 #makes it easier to replace the value
 M_NAME            ?= mop-module-tests
 M_SHARED_EXTERNAL ?= $(makefile_dir_path)/$(M_NAME)/shared
