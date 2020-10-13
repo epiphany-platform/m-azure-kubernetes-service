@@ -100,7 +100,7 @@ function init-default-config() {
   cp "$TESTS_DIR"/tests/mocks/default-config/state.yml "$TESTS_DIR"/shared/
   echo "# will initialize config with \"docker run ... init\" command"
   docker run --rm \
-    -v "$TESTS_DIR"/shared:/shared \
+    -v "$MOUNT_DIR"/shared:/shared \
     -t "$1" \
     init
 }
@@ -115,9 +115,9 @@ function check-default-config-content() {
 function init-2-5-autoscaled-aks() {
   echo "# prepare test state file"
   cp "$TESTS_DIR"/tests/mocks/config-with-variables/state.yml "$TESTS_DIR"/shared/
-  echo "#	will initialize config with \"docker run ... init M_VMS_COUNT=2 M_PUBLIC_IPS=false M_NAME=azbi-module-tests M_VMS_RSA=test_vms_rsa command\""
+  echo "#	will initialize config with \"docker run ... init M_NAME=azks-module-tests M_VMS_RSA=test_vms_rsa M_ADDRESS_PREFIX=10.0.0.0/16 M_SIZE=2 M_MIN=2 M_MAX=5 M_VM_SIZE=Standard_DS2_v2 M_DISK_SIZE=40 M_AUTO_SCALING=true command\""
   docker run --rm \
-    -v "$TESTS_DIR"/shared:/shared \
+    -v "$MOUNT_DIR"/shared:/shared \
     -t "$1" \
     init \
     M_NAME=azks-module-tests \
@@ -150,7 +150,7 @@ function prepare-azks-module-tests-rg() {
 function plan-2-5-autoscaled-aks() {
   echo "#	will plan with \"docker run ... plan M_ARM_CLIENT_ID=... M_ARM_CLIENT_SECRET=... M_ARM_SUBSCRIPTION_ID=... M_ARM_TENANT_ID=...\""
   docker run --rm \
-    -v "$TESTS_DIR"/shared:/shared \
+    -v "$MOUNT_DIR"/shared:/shared \
     -t "$1" \
     plan \
     M_ARM_CLIENT_ID="$2" \
@@ -183,7 +183,7 @@ function teardown-azks-module-tests-rg() {
 function apply-2-5-autoscaled-aks() {
   echo "#	will apply with \"docker run ... apply M_ARM_CLIENT_ID=... M_ARM_CLIENT_SECRET=... M_ARM_SUBSCRIPTION_ID=... M_ARM_TENANT_ID=...\""
   docker run --rm \
-    -v "$TESTS_DIR"/shared:/shared \
+    -v "$MOUNT_DIR"/shared:/shared \
     -t "$1" \
     apply \
     M_ARM_CLIENT_ID="$2" \
@@ -221,7 +221,7 @@ function validate-azure-resources-presence() {
 function cleanup-after-apply() {
   echo "#	will apply with \"docker run ... plan-destroy M_ARM_CLIENT_ID=... M_ARM_CLIENT_SECRET=... M_ARM_SUBSCRIPTION_ID=... M_ARM_TENANT_ID=...\""
   docker run --rm \
-    -v "$TESTS_DIR"/shared:/shared \
+    -v "$MOUNT_DIR"/shared:/shared \
     -t "$1" \
     plan-destroy \
     M_ARM_CLIENT_ID="$2" \
@@ -230,7 +230,7 @@ function cleanup-after-apply() {
     M_ARM_TENANT_ID="$5"
   echo "#	will apply with \"docker run ... destroy M_ARM_CLIENT_ID=... M_ARM_CLIENT_SECRET=... M_ARM_SUBSCRIPTION_ID=... M_ARM_TENANT_ID=...\""
   docker run --rm \
-    -v "$TESTS_DIR"/shared:/shared \
+    -v "$MOUNT_DIR"/shared:/shared \
     -t "$1" \
     destroy \
     M_ARM_CLIENT_ID="$2" \
@@ -239,7 +239,19 @@ function cleanup-after-apply() {
     M_ARM_TENANT_ID="$5"
 }
 
-TESTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+# AZKS_K8S_VOL and AZKS_MOUNT are variables to set up when kubernetes based build agents are in use ('docker in docker')
+# AZKS_K8S_VOL - volume's mount point
+# AZKS_MOUNT - shared folder location on kubernetes host
+AZKS_K8S_VOL=${AZKS_K8S_VOL:=""}
+AZKS_MOUNT=${AZKS_MOUNT:=""}
+TESTS_DIR_TMP="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+TESTS_DIR=${AZKS_K8S_VOL:=${TESTS_DIR_TMP}}
+MOUNT_DIR=${AZKS_MOUNT:=${TESTS_DIR_TMP}}
+
+# Create folder structure inside volume
+if [ "$AZKS_K8S_VOL" == "\/*" ]; then
+  mkdir -p "$AZKS_K8S_VOL"/shared && cp -r "$TESTS_DIR_TMP"/tests/mocks/ "$AZKS_K8S_VOL"
+fi
 
 # shellcheck disable=SC1090
 source "$(dirname "$0")/suite.sh"

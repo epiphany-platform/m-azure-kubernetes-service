@@ -41,6 +41,13 @@ test: build \
 	test-apply \
 	generate-report
 
+test-release: release \
+	test-default-config \
+	test-config-with-variables \
+	test-plan \
+	test-apply \
+	generate-report
+
 release: guard-VERSION guard-IMAGE guard-USER
 	docker build \
 		--build-arg ARG_M_VERSION=$(VERSION) \
