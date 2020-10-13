@@ -94,7 +94,7 @@ function setup() {
 }
 
 function generate_junit_report() {
-  go-junit-report <"$TESTS_DIR"/tests.out >"$TESTS_DIR"/repot.xml
+  go-junit-report <"$TESTS_DIR"/tests.out >"$TESTS_DIR"/report.xml
   rm "$TESTS_DIR"/tests.out
 }
 
