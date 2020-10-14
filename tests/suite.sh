@@ -100,5 +100,5 @@ function generate_junit_report() {
 
 function microtime() {
   #this is due to macOS BSD'ish date command
-  python -c 'import time; print time.time()'
+  python -c 'import time; print(time.time())'
 }
