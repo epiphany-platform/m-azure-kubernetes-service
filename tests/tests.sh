@@ -250,7 +250,7 @@ MOUNT_DIR=${AZKS_MOUNT:=${TESTS_DIR_TMP}}
 
 # Create folder structure inside volume
 if [ "$AZKS_K8S_VOL" == "\/*" ]; then
-  mkdir -p "$AZKS_K8S_VOL"/shared && cp -r "$TESTS_DIR_TMP"/tests/mocks/ "$AZKS_K8S_VOL"
+  mkdir -p "$AZKS_K8S_VOL"/shared && cp -r "$TESTS_DIR_TMP"/mocks/ "$AZKS_K8S_VOL"
 fi
 
 # shellcheck disable=SC1090
