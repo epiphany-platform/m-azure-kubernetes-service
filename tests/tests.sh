@@ -239,18 +239,18 @@ function cleanup-after-apply() {
     M_ARM_TENANT_ID="$5"
 }
 
-# AZKS_K8S_VOL and AZKS_MOUNT are variables to set up when kubernetes based build agents are in use ('docker in docker')
-# AZKS_K8S_VOL - volume's mount point
-# AZKS_MOUNT - shared folder location on kubernetes host
-AZKS_K8S_VOL=${AZKS_K8S_VOL:=""}
-AZKS_MOUNT=${AZKS_MOUNT:=""}
+# K8S_VOL_PATH and K8S_HOST_PATH are variables to set up when kubernetes based build agents are in use ('docker in docker')
+# K8S_VOL_PATH - volume's mount path
+# K8S_HOST_PATH - shared folder located on kubernetes host (this location is used to mount in container as share)
+K8S_VOL_PATH=${K8S_VOL_PATH:=""}
+K8S_HOST_PATH=${K8S_HOST_PATH:=""}
 TESTS_DIR_TMP="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
-TESTS_DIR=${AZKS_K8S_VOL:=${TESTS_DIR_TMP}}
-MOUNT_DIR=${AZKS_MOUNT:=${TESTS_DIR_TMP}}
+TESTS_DIR=${K8S_VOL_PATH:=${TESTS_DIR_TMP}}
+MOUNT_DIR=${K8S_HOST_PATH:=${TESTS_DIR_TMP}}
 
 # Create folder structure inside volume
-if [ "$AZKS_K8S_VOL" == "\/*" ]; then
-  mkdir -p "$AZKS_K8S_VOL"/shared && cp -r "$TESTS_DIR_TMP"/mocks/ "$AZKS_K8S_VOL"
+if [[ "$K8S_VOL_PATH" == \/* ]]; then
+  mkdir -p "$K8S_VOL_PATH"/shared && cp -r "$TESTS_DIR_TMP"/mocks/ "$K8S_VOL_PATH"
 fi
 
 # shellcheck disable=SC1090
