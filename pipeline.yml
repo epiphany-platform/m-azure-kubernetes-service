@@ -5,16 +5,6 @@ pr:
 pool:
   name: 'Azure Epiphany cluster - epiphany-build-agents-v2'
 
-variables:
-  k8s_host_path: $(k8s_host_path)
-  k8s_vol_path: $(k8s_vol_path)
-  WORK_DIR: $(System.DefaultWorkingDirectory)
-  CLIENT_ID: $(client_id)
-  CLIENT_SECRET: $(client_secret)
-  SUBSCRIPTION_ID: $(subscription_id)
-  TENANT_ID: $(tenant_id)
-
-
 steps:
   - task: UsePythonVersion@0
     displayName: 'Use Python 3.7'
