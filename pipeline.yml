@@ -67,7 +67,6 @@ jobs:
             docker rmi $(registry_name)/$(REPOSITORY_NAME)/$(IMAGE_NAME):$(MAJOR_VERSION).$(Build.BuildId)
             docker rmi $(REPOSITORY_NAME)/$(IMAGE_NAME):$(MAJOR_VERSION).$(Build.BuildId)
   - job: test
-    condition: eq(variables['build.reason'], 'PullRequest')
     steps:
       - task: UsePythonVersion@0
         displayName: 'Use Python 3.7'
