@@ -6,6 +6,7 @@ pool:
   name: 'Azure Epiphany cluster - epiphany-build-agents-v2'
 
 variables:
+  CLIENT_SECRET: $(client_secret)
   WORK_DIR: $(System.DefaultWorkingDirectory)
 
 steps:
