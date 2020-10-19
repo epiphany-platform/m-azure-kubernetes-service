@@ -10,6 +10,7 @@ function usage() {
     $0 test-default-config-suite [image_name]
     $0 test-config-with-variables-suite [image_name]
     $0 test-plan-suite [image_name] [ARM_CLIENT_ID] [ARM_CLIENT_SECRET] [ARM_SUBSCRIPTION_ID] [ARM_TENANT_ID]
+    $0 test-apply-suite [image_name] [ARM_CLIENT_ID] [ARM_CLIENT_SECRET] [ARM_SUBSCRIPTION_ID] [ARM_TENANT_ID]
     "
 }
 
@@ -241,8 +242,6 @@ function cleanup-after-apply() {
     M_ARM_TENANT_ID="$5"
 }
 
-echo "1: ${K8S_HOST_PATH} 2: ${K8S_VOL_PATH} 3: ${WORK_DIR}"
-
 # K8S_VOL_PATH and K8S_HOST_PATH are variables to set up when kubernetes based build agents are in use ('docker in docker')
 # K8S_VOL_PATH - volume's mount path
 # K8S_HOST_PATH - shared folder located on kubernetes host (this location is used to mount in container as share)
@@ -251,8 +250,6 @@ K8S_HOST_PATH=${K8S_HOST_PATH:=""}
 TESTS_DIR_TMP="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 TESTS_DIR=${K8S_VOL_PATH:=${TESTS_DIR_TMP}}
 MOUNT_DIR=${K8S_HOST_PATH:=${TESTS_DIR_TMP}}
-
-echo "1: ${K8S_HOST_PATH} 2: ${K8S_VOL_PATH} 3: ${WORK_DIR}"
 
 # Create folder structure inside volume
 if [[ "$K8S_VOL_PATH" == \/* ]]; then
