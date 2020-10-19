@@ -47,7 +47,11 @@ function test-plan-suite() {
   #$4 is ARM_SUBSCRIPTION_ID
   #$5 is ARM_TENANT_ID
   start_suite test-plan
-
+  echo "IMAGE_NAME: $1"
+  echo "ARM_CLIENT_ID: $2"
+  echo "ARM_CLIENT_SECRET: $3"
+  echo "ARM_SUBSCRIPTION_ID: $4"
+  echo "ARM_TENANT_ID: $5"
   r=0
   run_test init-2-5-autoscaled-aks "$r" "$1"
   r=$?
