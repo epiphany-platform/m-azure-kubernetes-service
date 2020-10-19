@@ -1,6 +1,12 @@
 pr:
-  - develop
-  - master
+  branches:
+    include:
+    - master
+    - develop
+  paths:
+    exclude:
+    - README.md
+    - CHANGELOG/*
 
 pool:
   name: 'Azure Epiphany cluster - epiphany-build-agents-v2'
