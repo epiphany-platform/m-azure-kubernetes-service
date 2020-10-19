@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-set -x
-
 function usage() {
   echo "usage:
     $0 cleanup
@@ -274,11 +272,6 @@ test-config-with-variables-suite)
   test-config-with-variables-suite "$2"
   ;;
 test-plan-suite)
-  echo "IMAGE_NAME: $2"
-  echo "ARM_CLIENT_ID: $3"
-  echo "ARM_CLIENT_SECRET: $4"
-  echo "ARM_SUBSCRIPTION_ID: $5"
-  echo "ARM_TENANT_ID: $6"
   if [[ $# -ne 6 ]]; then
     usage
     exit 1
