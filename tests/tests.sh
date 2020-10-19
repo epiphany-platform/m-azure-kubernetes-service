@@ -250,6 +250,8 @@ TESTS_DIR_TMP="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 TESTS_DIR=${K8S_VOL_PATH:=${TESTS_DIR_TMP}}
 MOUNT_DIR=${K8S_HOST_PATH:=${TESTS_DIR_TMP}}
 
+echo "1: ${K8S_HOST_PATH} 2: ${K8S_VOL_PATH} 3: ${WORK_DIR}"
+
 # Create folder structure inside volume
 if [[ "$K8S_VOL_PATH" == \/* ]]; then
   mkdir -p "$K8S_VOL_PATH"/shared && cp -r "$TESTS_DIR_TMP"/mocks/ "$K8S_VOL_PATH"

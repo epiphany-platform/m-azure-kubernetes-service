@@ -58,7 +58,6 @@ steps:
         export K8S_HOST_PATH="${k8s_host_path}/${IMAGE_NAME}"
         export K8S_VOL_PATH="${k8s_vol_path}/${IMAGE_NAME}"
         cd $WORK_DIR
-        echo "1: ${K8S_HOST_PATH} 2: ${K8S_VOL_PATH} 3: ${WORK_DIR}"
         echo "Start make test"
         make test ARM_CLIENT_ID=$CLIENT_ID ARM_CLIENT_SECRET=$CLIENT_SECRET ARM_SUBSCRIPTION_ID=$SUBSCRIPTION_ID ARM_TENANT_ID=$TENANT_ID
       failOnStderr: true
