@@ -5,6 +5,9 @@ pr:
 pool:
   name: 'Azure Epiphany cluster - epiphany-build-agents-v2'
 
+variables:
+  WORK_DIR: $(System.DefaultWorkingDirectory)
+
 steps:
   - task: UsePythonVersion@0
     displayName: 'Use Python 3.7'
