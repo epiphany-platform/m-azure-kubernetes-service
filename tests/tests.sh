@@ -47,11 +47,6 @@ function test-plan-suite() {
   #$4 is ARM_SUBSCRIPTION_ID
   #$5 is ARM_TENANT_ID
   start_suite test-plan
-  echo "IMAGE_NAME: $1"
-  echo "ARM_CLIENT_ID: $2"
-  echo "ARM_CLIENT_SECRET: $3"
-  echo "ARM_SUBSCRIPTION_ID: $4"
-  echo "ARM_TENANT_ID: $5"
   r=0
   run_test init-2-5-autoscaled-aks "$r" "$1"
   r=$?
@@ -279,6 +274,11 @@ test-config-with-variables-suite)
   test-config-with-variables-suite "$2"
   ;;
 test-plan-suite)
+  echo "IMAGE_NAME: $2"
+  echo "ARM_CLIENT_ID: $3"
+  echo "ARM_CLIENT_SECRET: $4"
+  echo "ARM_SUBSCRIPTION_ID: $5"
+  echo "ARM_TENANT_ID: $6"
   if [[ $# -ne 6 ]]; then
     usage
     exit 1
