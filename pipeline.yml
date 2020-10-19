@@ -16,7 +16,7 @@ variables:
   WORK_DIR: $(System.DefaultWorkingDirectory)
 
 jobs:
-  - job: build
+  - job: build and publish
     condition: eq(variables['build.sourceBranch'], 'refs/heads/develop')
     steps:
       - task: Bash@3
