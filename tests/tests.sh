@@ -241,6 +241,8 @@ function cleanup-after-apply() {
     M_ARM_TENANT_ID="$5"
 }
 
+echo "1: ${K8S_HOST_PATH} 2: ${K8S_VOL_PATH} 3: ${WORK_DIR}"
+
 # K8S_VOL_PATH and K8S_HOST_PATH are variables to set up when kubernetes based build agents are in use ('docker in docker')
 # K8S_VOL_PATH - volume's mount path
 # K8S_HOST_PATH - shared folder located on kubernetes host (this location is used to mount in container as share)
