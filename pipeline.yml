@@ -6,7 +6,6 @@ pool:
   name: 'Azure Epiphany cluster - epiphany-build-agents-v2'
 
 variables:
-  CLIENT_SECRET: $(clientSecret)
   WORK_DIR: $(System.DefaultWorkingDirectory)
 
 steps:
@@ -62,6 +61,8 @@ steps:
         echo "Start make test"
         make test ARM_CLIENT_ID=$CLIENT_ID ARM_CLIENT_SECRET=$CLIENT_SECRET ARM_SUBSCRIPTION_ID=$SUBSCRIPTION_ID ARM_TENANT_ID=$TENANT_ID
       failOnStderr: true
+      env:
+        CLIENT_SECRET: $(clientSecret)
   - task: CmdLine@2
     displayName: 'Delete created image'
     inputs:
