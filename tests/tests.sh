@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -x
+
 function usage() {
   echo "usage:
     $0 cleanup
