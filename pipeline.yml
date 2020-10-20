@@ -12,9 +12,6 @@ pr:
 pool:
   name: 'Azure Epiphany cluster - epiphany-build-agents-v2'
 
-variables:
-  WORK_DIR: $(System.DefaultWorkingDirectory)
-
 jobs:
   - job: Test
     steps:
@@ -72,6 +69,7 @@ jobs:
           failOnStderr: true
         env:
           CLIENT_SECRET: $(clientSecret)
+          WORK_DIR: $(System.DefaultWorkingDirectory)
       - task: CmdLine@2
         displayName: 'Delete created image'
         inputs:
