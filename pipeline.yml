@@ -86,53 +86,53 @@ jobs:
           searchFolder: '$(k8s_vol_path)/$(IMAGE_NAME)/'
           publishRunAttachments: true
   - job: Publish
-      dependsOn: Test
-      condition: and(succeeded(), eq(variables['build.sourceBranch'], 'refs/heads/develop'))
-      steps:
-        - task: Bash@3
-          displayName: 'Read Variables from Makefile'
-          inputs:
-            targetType: 'inline'
-            script: |
-              READ_MAJOR_VERSION=`grep VERSION\ \?\= Makefile | awk -F ' ?= ' '{print $2}'`
-              READ_REPOSITORY_NAME=`grep USER\ \:\= Makefile | awk -F ' := ' '{print $2}'`
-              READ_IMAGE_NAME=`grep IMAGE\ \:\= Makefile | awk -F ' := ' '{print $2}'`
-              echo "##vso[task.setvariable variable=MAJOR_VERSION]$READ_MAJOR_VERSION"
-              echo "##vso[task.setvariable variable=REPOSITORY_NAME]$READ_REPOSITORY_NAME"
-              echo "##vso[task.setvariable variable=IMAGE_NAME]$READ_IMAGE_NAME"
-        - task: Bash@3
-          displayName: 'Read Variables from Makefile'
-          inputs:
-            targetType: 'inline'
-            script: |
-              echo "MAJOR_VERSION: $(MAJOR_VERSION)"
-              echo "REPOSITORY_NAME: $(REPOSITORY_NAME)"
-              echo "IMAGE_NAME: $(IMAGE_NAME)"
-              echo "Build.BuildId: $(Build.BuildId)"
-        - task: CmdLine@2
-          displayName: 'Build and Tag image'
-          inputs:
-            script: |
-              set -eu
-              cd $(System.DefaultWorkingDirectory)
-              echo "Working dir: "
-              pwd
-              echo "Start make build"
-              make build VERSION=$(MAJOR_VERSION).$(Build.BuildId)
-              docker tag $(REPOSITORY_NAME)/$(IMAGE_NAME):$(MAJOR_VERSION).$(Build.BuildId) $(registry_name)/$(REPOSITORY_NAME)/$(IMAGE_NAME):$(MAJOR_VERSION).$(Build.BuildId)
-        - task: Docker@2
-          displayName: 'Push image'
-          inputs:
-            containerRegistry: $(registry_name)
-            command: push
-            repository: $(REPOSITORY_NAME)/$(IMAGE_NAME)
-            tags: $(MAJOR_VERSION).$(Build.BuildId)
-        - task: CmdLine@2
-          displayName: 'Cleaning'
-          inputs:
-            script: |
-              echo "Deleting images"
-              echo "---------------------------------------------------------------"
-              echo "Removing images"
-              docker rmi $(registry_name)/$(REPOSITORY_NAME)/$(IMAGE_NAME):$(MAJOR_VERSION).$(Build.BuildId)
-              docker rmi $(REPOSITORY_NAME)/$(IMAGE_NAME):$(MAJOR_VERSION).$(Build.BuildId)
+    dependsOn: Test
+    condition: and(succeeded(), eq(variables['build.sourceBranch'], 'refs/heads/develop'))
+    steps:
+      - task: Bash@3
+        displayName: 'Read Variables from Makefile'
+        inputs:
+          targetType: 'inline'
+          script: |
+            READ_MAJOR_VERSION=`grep VERSION\ \?\= Makefile | awk -F ' ?= ' '{print $2}'`
+            READ_REPOSITORY_NAME=`grep USER\ \:\= Makefile | awk -F ' := ' '{print $2}'`
+            READ_IMAGE_NAME=`grep IMAGE\ \:\= Makefile | awk -F ' := ' '{print $2}'`
+            echo "##vso[task.setvariable variable=MAJOR_VERSION]$READ_MAJOR_VERSION"
+            echo "##vso[task.setvariable variable=REPOSITORY_NAME]$READ_REPOSITORY_NAME"
+            echo "##vso[task.setvariable variable=IMAGE_NAME]$READ_IMAGE_NAME"
+      - task: Bash@3
+        displayName: 'Read Variables from Makefile'
+        inputs:
+          targetType: 'inline'
+          script: |
+            echo "MAJOR_VERSION: $(MAJOR_VERSION)"
+            echo "REPOSITORY_NAME: $(REPOSITORY_NAME)"
+            echo "IMAGE_NAME: $(IMAGE_NAME)"
+            echo "Build.BuildId: $(Build.BuildId)"
+      - task: CmdLine@2
+        displayName: 'Build and Tag image'
+        inputs:
+          script: |
+            set -eu
+            cd $(System.DefaultWorkingDirectory)
+            echo "Working dir: "
+            pwd
+            echo "Start make build"
+            make build VERSION=$(MAJOR_VERSION).$(Build.BuildId)
+            docker tag $(REPOSITORY_NAME)/$(IMAGE_NAME):$(MAJOR_VERSION).$(Build.BuildId) $(registry_name)/$(REPOSITORY_NAME)/$(IMAGE_NAME):$(MAJOR_VERSION).$(Build.BuildId)
+      - task: Docker@2
+        displayName: 'Push image'
+        inputs:
+          containerRegistry: $(registry_name)
+          command: push
+          repository: $(REPOSITORY_NAME)/$(IMAGE_NAME)
+          tags: $(MAJOR_VERSION).$(Build.BuildId)
+      - task: CmdLine@2
+        displayName: 'Cleaning'
+        inputs:
+          script: |
+            echo "Deleting images"
+            echo "---------------------------------------------------------------"
+            echo "Removing images"
+            docker rmi $(registry_name)/$(REPOSITORY_NAME)/$(IMAGE_NAME):$(MAJOR_VERSION).$(Build.BuildId)
+            docker rmi $(REPOSITORY_NAME)/$(IMAGE_NAME):$(MAJOR_VERSION).$(Build.BuildId)
