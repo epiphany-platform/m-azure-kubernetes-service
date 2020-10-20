@@ -10,7 +10,7 @@ pr:
       - develop
 
 pool:
-  name: 'Azure Epiphany cluster - epiphany-build-agents-v2'
+  name: $(poolName)
 
 jobs:
   - job: Test
