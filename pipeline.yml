@@ -46,9 +46,9 @@ jobs:
         inputs:
           targetType: 'inline'
           script: |
-            READ_MAJOR_VERSION=`grep VERSION\ \?\= Makefile | awk -F ' ?= ' '{print $2}'`
-            READ_REPOSITORY_NAME=`grep USER\ \:\= Makefile | awk -F ' := ' '{print $2}'`
-            READ_IMAGE_NAME=`grep IMAGE\ \:\= Makefile | awk -F ' := ' '{print $2}'`
+            READ_MAJOR_VERSION=`make print-VERSION`
+            READ_REPOSITORY_NAME=`make print-USER`
+            READ_IMAGE_NAME=`make print-IMAGE`
             SET_PATH=`echo $GOPATH:$GOBIN:$PATH`
             echo "##vso[task.setvariable variable=MAJOR_VERSION]$READ_MAJOR_VERSION"
             echo "##vso[task.setvariable variable=REPOSITORY_NAME]$READ_REPOSITORY_NAME"
