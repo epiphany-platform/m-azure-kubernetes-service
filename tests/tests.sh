@@ -8,6 +8,7 @@ function usage() {
     $0 test-default-config-suite [image_name]
     $0 test-config-with-variables-suite [image_name]
     $0 test-plan-suite [image_name] [ARM_CLIENT_ID] [ARM_CLIENT_SECRET] [ARM_SUBSCRIPTION_ID] [ARM_TENANT_ID]
+    $0 test-apply-suite [image_name] [ARM_CLIENT_ID] [ARM_CLIENT_SECRET] [ARM_SUBSCRIPTION_ID] [ARM_TENANT_ID]
     "
 }
 
@@ -44,7 +45,6 @@ function test-plan-suite() {
   #$4 is ARM_SUBSCRIPTION_ID
   #$5 is ARM_TENANT_ID
   start_suite test-plan
-
   r=0
   run_test init-2-5-autoscaled-aks "$r" "$1"
   r=$?
