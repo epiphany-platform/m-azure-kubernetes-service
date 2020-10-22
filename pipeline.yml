@@ -46,7 +46,7 @@ jobs:
         inputs:
           targetType: 'inline'
           script: |
-            echo "##vso[task.setvariable variable=MAJOR_VERSION]$(print-VERSION)"
+            echo "##vso[task.setvariable variable=MAJOR_VERSION]$(make print-VERSION)"
             echo "##vso[task.setvariable variable=REPOSITORY_NAME]$(make print-USER)"
             echo "##vso[task.setvariable variable=IMAGE_NAME]$(make print-IMAGE)"
             echo "##vso[task.setvariable variable=PATH]$(echo $GOPATH:$GOBIN:$PATH)"
