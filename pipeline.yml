@@ -101,7 +101,7 @@ jobs:
             echo "##vso[task.setvariable variable=REPOSITORY_NAME]$READ_REPOSITORY_NAME"
             echo "##vso[task.setvariable variable=IMAGE_NAME]$READ_IMAGE_NAME"
       - task: Bash@3
-        displayName: 'Read Variables from Makefile'
+        displayName: 'Echo variables obtained from Makefile'
         inputs:
           targetType: 'inline'
           script: |
