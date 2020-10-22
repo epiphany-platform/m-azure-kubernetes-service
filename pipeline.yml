@@ -35,9 +35,7 @@ jobs:
       - task: GoTool@0
         displayName: 'Install GO'
         inputs:
-          version: '1.10'
-          goPath: '/root/go'
-          goBin: '/root/go/bin'
+          version: '1.15.2'
       - task: Go@0
         displayName: 'Get go-junit-report plugin'
         inputs:
