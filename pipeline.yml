@@ -42,18 +42,14 @@ jobs:
           command: 'get'
           arguments: '-u github.com/jstemmer/go-junit-report'
       - task: Bash@3
-        displayName: 'Read and Set Variables'
+        displayName: 'Set Build Variables'
         inputs:
           targetType: 'inline'
           script: |
-            READ_MAJOR_VERSION=`make print-VERSION`
-            READ_REPOSITORY_NAME=`make print-USER`
-            READ_IMAGE_NAME=`make print-IMAGE`
-            SET_PATH=`echo $GOPATH:$GOBIN:$PATH`
-            echo "##vso[task.setvariable variable=MAJOR_VERSION]$READ_MAJOR_VERSION"
-            echo "##vso[task.setvariable variable=REPOSITORY_NAME]$READ_REPOSITORY_NAME"
-            echo "##vso[task.setvariable variable=IMAGE_NAME]$READ_IMAGE_NAME"
-            echo "##vso[task.setvariable variable=PATH]$SET_PATH"
+            echo "##vso[task.setvariable variable=MAJOR_VERSION]$(print-VERSION)"
+            echo "##vso[task.setvariable variable=REPOSITORY_NAME]$(make print-USER)"
+            echo "##vso[task.setvariable variable=IMAGE_NAME]$(make print-IMAGE)"
+            echo "##vso[task.setvariable variable=PATH]$(echo $GOPATH:$GOBIN:$PATH)"
       - task: Bash@3
         displayName: 'Run Tests'
         inputs:
@@ -69,12 +65,11 @@ jobs:
           CLIENT_SECRET: $(clientSecret)
           WORK_DIR: $(System.DefaultWorkingDirectory)
       - task: CmdLine@2
-        displayName: 'Delete created image'
+        displayName: 'Cleanup Local Image'
         inputs:
           script: |
-            echo "Deleting image"
-            echo "---------------------------------------------------------------"
             echo "Removing image"
+            echo "---------------------------------------------------------------"
             docker rmi $(REPOSITORY_NAME)/$(IMAGE_NAME):$(MAJOR_VERSION) --force
       - task: PublishTestResults@2
         displayName: 'Publish Test Results report.xml'
@@ -88,18 +83,15 @@ jobs:
     condition: and(succeeded(), eq(variables['build.sourceBranch'], 'refs/heads/develop'))
     steps:
       - task: Bash@3
-        displayName: 'Read Variables from Makefile'
+        displayName: 'Set Build Variables'
         inputs:
           targetType: 'inline'
           script: |
-            READ_MAJOR_VERSION=`make print-VERSION`
-            READ_REPOSITORY_NAME=`make print-USER`
-            READ_IMAGE_NAME=`make print-IMAGE`
-            echo "##vso[task.setvariable variable=MAJOR_VERSION]$READ_MAJOR_VERSION"
-            echo "##vso[task.setvariable variable=REPOSITORY_NAME]$READ_REPOSITORY_NAME"
-            echo "##vso[task.setvariable variable=IMAGE_NAME]$READ_IMAGE_NAME"
+            echo "##vso[task.setvariable variable=MAJOR_VERSION]$(make print-VERSION)"
+            echo "##vso[task.setvariable variable=REPOSITORY_NAME]$(make print-USER)"
+            echo "##vso[task.setvariable variable=IMAGE_NAME]$(make print-IMAGE)"
       - task: Bash@3
-        displayName: 'Echo variables obtained from Makefile'
+        displayName: 'Print Variables'
         inputs:
           targetType: 'inline'
           script: |
@@ -108,7 +100,7 @@ jobs:
             echo "IMAGE_NAME: $(IMAGE_NAME)"
             echo "Build.BuildId: $(Build.BuildId)"
       - task: Docker@2
-        displayName: 'Build and push image'
+        displayName: 'Build and Push Image'
         inputs:
           containerRegistry: $(registry_name)
           command: buildAndPush
@@ -117,10 +109,9 @@ jobs:
           Dockerfile: $(System.DefaultWorkingDirectory)/Dockerfile
           buildContext: $(System.DefaultWorkingDirectory)
       - task: CmdLine@2
-        displayName: 'Cleaning'
+        displayName: 'Cleanup Local Image'
         inputs:
           script: |
-            echo "Deleting images"
+            echo "Removing image"
             echo "---------------------------------------------------------------"
-            echo "Removing images"
             docker rmi $(registry_name)/$(REPOSITORY_NAME)/$(IMAGE_NAME):$(MAJOR_VERSION).$(Build.BuildId)
