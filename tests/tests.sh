@@ -142,7 +142,7 @@ function prepare-azks-module-tests-rg() {
   echo "#	will do az login"
   az login --service-principal --username "$2" --password "$3" --tenant "$5" -o none
   echo "#	will create resource group azks-module-tests-rg"
-  az group create --subscription "$4" --location germanywestcentral --name azks-module-tests-rg
+  az group create --subscription "$4" --location francecentral --name azks-module-tests-rg
   echo "#	will create vnet azks-module-tests-vnet"
   az network vnet create --subscription "$4" --resource-group azks-module-tests-rg --name azks-module-tests-vnet --address-prefix 10.0.0.0/16
 }
