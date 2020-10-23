@@ -78,6 +78,7 @@ jobs:
           testResultsFiles: 'report.xml'
           searchFolder: '$(k8s_vol_path)/$(IMAGE_NAME)/'
           publishRunAttachments: true
+          failTaskOnFailedTests: true
   - job: Publish
     dependsOn: Test
     condition: and(succeeded(), eq(variables['build.sourceBranch'], 'refs/heads/develop'))
