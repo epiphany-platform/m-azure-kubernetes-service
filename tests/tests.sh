@@ -8,6 +8,7 @@ function usage() {
     $0 test-default-config-suite [image_name]
     $0 test-config-with-variables-suite [image_name]
     $0 test-plan-suite [image_name] [ARM_CLIENT_ID] [ARM_CLIENT_SECRET] [ARM_SUBSCRIPTION_ID] [ARM_TENANT_ID]
+    $0 test-apply-suite [image_name] [ARM_CLIENT_ID] [ARM_CLIENT_SECRET] [ARM_SUBSCRIPTION_ID] [ARM_TENANT_ID]
     "
 }
 
@@ -44,7 +45,6 @@ function test-plan-suite() {
   #$4 is ARM_SUBSCRIPTION_ID
   #$5 is ARM_TENANT_ID
   start_suite test-plan
-
   r=0
   run_test init-2-5-autoscaled-aks "$r" "$1"
   r=$?
@@ -142,7 +142,7 @@ function prepare-azks-module-tests-rg() {
   echo "#	will do az login"
   az login --service-principal --username "$2" --password "$3" --tenant "$5" -o none
   echo "#	will create resource group azks-module-tests-rg"
-  az group create --subscription "$4" --location germanywestcentral --name azks-module-tests-rg
+  az group create --subscription "$4" --location francecentral --name azks-module-tests-rg
   echo "#	will create vnet azks-module-tests-vnet"
   az network vnet create --subscription "$4" --resource-group azks-module-tests-rg --name azks-module-tests-vnet --address-prefix 10.0.0.0/16
 }
