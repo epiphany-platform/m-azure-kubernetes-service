@@ -41,6 +41,30 @@ EOF
 make all
 ```
 
+# Run module in existing subnet
+
+```shell
+cd examples/basic_flow
+ARM_CLIENT_ID="appId field" ARM_CLIENT_SECRET="password field" ARM_SUBSCRIPTION_ID="id field" ARM_TENANT_ID="tenant field" EXISTING_RG_NAME="existing rg name" EXISTING_SUBNET_ID="existing subnet id" make apply-only-azks
+```
+
+Or use config file with credentials:
+
+```shell
+cd examples/basic_flow
+cat >azure.mk <<'EOF'
+ARM_CLIENT_ID ?= "appId field"
+ARM_CLIENT_SECRET ?= "password field"
+ARM_SUBSCRIPTION_ID ?= "id field"
+ARM_TENANT_ID ?= "tenant field"
+EXISTING_RG_NAME ?= "existing rg name"
+EXISTING_SUBNET_ID ?= "existing subnet id"
+EOF
+make apply-only-azks
+```
+
+If You want to destroy the AKS, execute above instruction in the same way using destroy-only-azks command instead of apply-only-azks
+
 # Release module
 
 ```shell

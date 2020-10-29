@@ -9,6 +9,10 @@ VMS_RSA_FILENAME ?= vms_rsa
 
 export
 
+# replace the values if You want to run AKS in already existing subnet
+EXISTING_RG_NAME ?= unset
+EXISTING_SUBNET_ID ?= unset
+
 .PHONY: all clean init plan apply output destroy-plan destroy setup
 
 all: init plan apply
@@ -23,7 +27,9 @@ init: setup
 		M_VMS_COUNT=2 \
 		M_PUBLIC_IPS=false \
 		M_NAME=$(M_NAME) \
-		M_VMS_RSA=$(VMS_RSA_FILENAME)
+        M_VMS_RSA=$(VMS_RSA_FILENAME) \
+        M_EXISTING_RG_NAME=$(EXISTING_RG_NAME) \
+        M_EXISTING_SUBNET_ID=$(EXISTING_SUBNET_ID)
 
 plan: setup
 		@cd $(M_WORKDIR) && $(MAKE) plan \

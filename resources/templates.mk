@@ -15,6 +15,10 @@ $(M_MODULE_SHORT):
   vnet_name: $(M_VNET_NAME)
   address_prefix: $(M_ADDRESS_PREFIX)
 
+  # create aks in the existing subnet
+  existing_rg_name: $(M_EXISTING_RG_NAME)
+  existing_subnet_id: $(M_EXISTING_SUBNET_ID)
+
   # default node pool
   size: $(M_SIZE)
   min: $(M_MIN)

@@ -1,3 +1,12 @@
+variable "existing_subnet_id" {
+	description = "ID of the existing subnet to deploy AKS cluster in"
+	type        = string
+}
+
+variable "existing_rg_name" {
+	description = "Name of the existing resource group to deploy AKS cluster in"
+	type        = string
+}
 variable "name" {
   description = "Prefix for resource names"
   type        = string

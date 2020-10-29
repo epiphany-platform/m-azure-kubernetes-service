@@ -1,7 +1,19 @@
 M_NAME ?= epiphany
+
+# create aks in existing subnet
+M_EXISTING_RG_NAME ?= unset
+M_EXISTING_SUBNET_ID ?= unset
+
+# create aks in azbi
+ifeq ($(M_EXISTING_RG_NAME),unset)
 M_RG_NAME ?= $(M_NAME)-rg
 M_VNET_NAME ?= $(M_NAME)-vnet
 M_ADDRESS_PREFIX ?= 10.0.0.0/16
+else
+M_RG_NAME ?= unset
+M_VNET_NAME ?= unset
+M_ADDRESS_PREFIX ?= unset
+endif
 
 # default node pool
 M_SIZE ?= 2

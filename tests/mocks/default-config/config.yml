@@ -5,6 +5,10 @@ azks:
   vnet_name: epiphany-vnet
   address_prefix: 10.0.0.0/16
 
+  # create aks in the existing subnet
+  existing_rg_name: unset
+  existing_subnet_id: unset
+
   # default node pool
   size: 2
   min: 2
