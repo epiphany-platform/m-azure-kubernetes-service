@@ -11,6 +11,13 @@ VMS_RSA_FILENAME ?= vms_rsa
 
 export
 
+# replace the value to true if You want to deploy AKS in existing subnet
+EXISTING_SUBNET ?= false
+
+M_RG_NAME       ?= $(M_NAME)-rg
+M_VNET_NAME     ?= $(M_NAME)-vnet
+M_SUBNET_NAME   ?= $(M_NAME)-snet-aks
+
 .PHONY: all apply destroy clean metadata setup
 
 all: apply
@@ -18,8 +25,12 @@ all: apply
 apply: init-azbi plan-azbi apply-azbi \
        init-azks plan-azks apply-azks
 
+apply-only-azks: init-azks plan-azks apply-azks
+
 destroy: destroy-plan-azks destroy-azks \
          destroy-plan-azbi destroy-azbi
+
+destroy-only-azks: destroy-plan-azks destroy-azks
 
 clean:
 	@rm -rf $(M_SHARED_EXTERNAL)
@@ -100,7 +111,11 @@ init-azks: setup
 		M_VMS_COUNT=2 \
 		M_PUBLIC_IPS=false \
 		M_NAME=$(M_NAME) \
-		M_VMS_RSA=$(VMS_RSA_FILENAME)
+		M_VMS_RSA=$(VMS_RSA_FILENAME) \
+		M_RG_NAME=$(M_RG_NAME) \
+		M_VNET_NAME=$(M_VNET_NAME) \
+		M_SUBNET_NAME=$(M_SUBNET_NAME) \
+		M_EXISTING_SUBNET=$(EXISTING_SUBNET)
 
 plan-azks: setup
 	@docker run --rm \

@@ -14,6 +14,8 @@ $(M_MODULE_SHORT):
   rg_name: $(M_RG_NAME)
   vnet_name: $(M_VNET_NAME)
   address_prefix: $(M_ADDRESS_PREFIX)
+  subnet_name: $(M_SUBNET_NAME)
+  existing_subnet: $(M_EXISTING_SUBNET)
 
   # default node pool
   size: $(M_SIZE)

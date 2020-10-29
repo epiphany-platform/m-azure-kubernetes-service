@@ -7,8 +7,16 @@ data "azurerm_virtual_network" "vnet" {
   resource_group_name = data.azurerm_resource_group.main_rg.name
 }
 
+data "azurerm_subnet" "subnet" {
+  count                = var.existing_subnet ? 1 : 0
+  name                 = var.subnet_name
+  virtual_network_name = data.azurerm_virtual_network.vnet.name
+  resource_group_name  = data.azurerm_resource_group.main_rg.name
+}
+
 resource "azurerm_subnet" "subnet" {
-  name                 = "${var.name}-snet-aks"
+  count                = var.existing_subnet ? 0 : 1
+  name                 = var.subnet_name
   resource_group_name  = data.azurerm_resource_group.main_rg.name
   virtual_network_name = data.azurerm_virtual_network.vnet.name
   address_prefixes     = [ cidrsubnet(var.address_prefix, 8, 16) ]
@@ -18,7 +26,7 @@ module "aks" {
   source       = "./modules/aks"
   name         = var.name
   rg_name      = data.azurerm_resource_group.main_rg.name
-  subnet_id    = azurerm_subnet.subnet.id
+  subnet_id    = var.existing_subnet ? data.azurerm_subnet.subnet[0].id : azurerm_subnet.subnet[0].id
   size         = var.size
   min          = var.min
   max          = var.max

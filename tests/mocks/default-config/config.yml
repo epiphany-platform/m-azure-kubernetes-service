@@ -4,6 +4,8 @@ azks:
   rg_name: epiphany-rg
   vnet_name: epiphany-vnet
   address_prefix: 10.0.0.0/16
+  subnet_name: epiphany-snet-aks
+  existing_subnet: false
 
   # default node pool
   size: 2
