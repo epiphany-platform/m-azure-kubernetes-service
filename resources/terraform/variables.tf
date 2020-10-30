@@ -40,12 +40,12 @@ variable "network_plugin" {
 
 variable "network_policy" {
   description = "AKS network policy"
-  type    = string
+  type        = string
 }
 
 variable "enable_rbac" {
   description = "Whether RBAC is enabled or not"
-  type    = bool
+  type        = bool
 }
 
 variable "default_node_pool" {
@@ -78,7 +78,7 @@ variable "auto_scaler_profile" {
 
 variable "identity_type" {
   description = "Identity type"
-  type    = string
+  type        = string
 }
 
 variable "kube_dashboard_enabled" {
