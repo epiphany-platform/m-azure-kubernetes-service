@@ -1,4 +1,3 @@
-AZBI := epiphanyplatform/azbi:0.0.1
 AZKS := epiphanyplatform/azks:0.0.1
 
 #makes it easier to replace the value
@@ -15,11 +14,9 @@ export
 
 all: apply
 
-apply: init-azbi plan-azbi apply-azbi \
-       init-azks plan-azks apply-azks
+apply: init-azks plan-azks apply-azks
 
-destroy: destroy-plan-azks destroy-azks \
-         destroy-plan-azbi destroy-azbi
+destroy: destroy-plan-azks destroy-azks
 
 clean:
 	@rm -rf $(M_SHARED_EXTERNAL)
@@ -28,67 +25,6 @@ metadata: guard-VERSION guard-IMAGE guard-USER
 	@docker run --rm \
 		-t $(USER)/$(IMAGE):$(VERSION) \
 		metadata
-
-.PHONY: init-azbi plan-azbi apply-azbi output-azbi destroy-plan-azbi destroy-azbi
-
-init-azbi: setup
-	@docker run --rm \
-		-v $(M_SHARED_EXTERNAL):/shared \
-		-t $(AZBI) \
-		init \
-		M_VMS_COUNT=2 \
-		M_PUBLIC_IPS=false \
-		M_NAME=$(M_NAME)
-
-plan-azbi: setup
-	@docker run --rm \
-		-v $(M_SHARED_EXTERNAL):/shared \
-		-t $(AZBI) \
-		plan \
-		M_ARM_CLIENT_ID=$$ARM_CLIENT_ID \
-		M_ARM_CLIENT_SECRET=$$ARM_CLIENT_SECRET \
-		M_ARM_SUBSCRIPTION_ID=$$ARM_SUBSCRIPTION_ID \
-		M_ARM_TENANT_ID=$$ARM_TENANT_ID
-
-apply-azbi: setup
-	@docker run --rm \
-		-v $(M_SHARED_EXTERNAL):/shared \
-		-t $(AZBI) \
-		apply \
-		M_ARM_CLIENT_ID=$$ARM_CLIENT_ID \
-		M_ARM_CLIENT_SECRET=$$ARM_CLIENT_SECRET \
-		M_ARM_SUBSCRIPTION_ID=$$ARM_SUBSCRIPTION_ID \
-		M_ARM_TENANT_ID=$$ARM_TENANT_ID
-
-output-azbi: setup
-	@docker run --rm \
-		-v $(M_SHARED_EXTERNAL):/shared \
-		-t $(AZBI) \
-		output \
-		M_ARM_CLIENT_ID=$$ARM_CLIENT_ID \
-		M_ARM_CLIENT_SECRET=$$ARM_CLIENT_SECRET \
-		M_ARM_SUBSCRIPTION_ID=$$ARM_SUBSCRIPTION_ID \
-		M_ARM_TENANT_ID=$$ARM_TENANT_ID
-
-destroy-plan-azbi: setup
-	@docker run --rm \
-		-v $(M_SHARED_EXTERNAL):/shared \
-		-t $(AZBI) \
-		plan-destroy \
-		M_ARM_CLIENT_ID=$$ARM_CLIENT_ID \
-		M_ARM_CLIENT_SECRET=$$ARM_CLIENT_SECRET \
-		M_ARM_SUBSCRIPTION_ID=$$ARM_SUBSCRIPTION_ID \
-		M_ARM_TENANT_ID=$$ARM_TENANT_ID
-
-destroy-azbi: setup
-	@docker run --rm \
-		-v $(M_SHARED_EXTERNAL):/shared \
-		-t $(AZBI) \
-		destroy \
-		M_ARM_CLIENT_ID=$$ARM_CLIENT_ID \
-		M_ARM_CLIENT_SECRET=$$ARM_CLIENT_SECRET \
-		M_ARM_SUBSCRIPTION_ID=$$ARM_SUBSCRIPTION_ID \
-		M_ARM_TENANT_ID=$$ARM_TENANT_ID
 
 .PHONY: init-azks plan-azks apply-azks output-azks destroy-plan-azks destroy-azks
 
@@ -100,7 +36,10 @@ init-azks: setup
 		M_VMS_COUNT=2 \
 		M_PUBLIC_IPS=false \
 		M_NAME=$(M_NAME) \
-		M_VMS_RSA=$(VMS_RSA_FILENAME)
+		M_VMS_RSA=$(VMS_RSA_FILENAME) \
+		M_RG_NAME=$(M_RG_NAME) \
+		M_VNET_NAME=$(M_VNET_NAME) \
+		M_SUBNET_NAME=$(M_SUBNET_NAME)
 
 plan-azks: setup
 	@docker run --rm \

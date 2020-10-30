@@ -12,6 +12,30 @@ az account list #get subscription from id field
 az account set --subscription="SUBSCRIPTION_ID"
 az ad sp create-for-rbac --role="Contributor" --scopes="/subscriptions/SUBSCRIPTION_ID" --name="SOME_MEANINGFUL_NAME" #get appID, password, tenant, name and displayName
 ```
+# Run module
+
+AKS and new subnet will be created in resource group and vnet from [AzBI Module](https://github.com/epiphany-platform/m-azure-basic-infrastructure) or you can create AKS in already existing subnet.
+
+* Initialize AzKS module in [AzBI Module](https://github.com/epiphany-platform/m-azure-basic-infrastructure)(without parameters it will extract some knowledge from status file):
+  ```shell
+  docker run --rm -v /tmp/shared:/shared -t epiphanyplatform/azks:latest init
+  ```
+  or initialize AzKS with some parameters (ie.: in already existing subnet by setting `M_SUBNET_NAME`): 
+  ```shell
+  docker run --rm -v /tmp/shared:/shared -t epiphanyplatform/azks:latest init M_RG_NAME="existing rg name" M_VNET_NAME="existing vnet name" M_SUBNET_NAME="existing subnet name"
+  ```
+  This commad will create configuration file of AzKS module in /tmp/shared/azks/azks-config.yml. You can investigate what is stored in that file and change it at will.
+* Plan and apply AzKS module:
+  ```shell
+  docker run --rm -v /tmp/shared:/shared -t epiphanyplatform/azks:latest plan M_ARM_CLIENT_ID=appId M_ARM_CLIENT_SECRET=password M_ARM_SUBSCRIPTION_ID=subscriptionId M_ARM_TENANT_ID=tenantId
+  docker run --rm -v /tmp/shared:/shared -t epiphanyplatform/azks:latest apply M_ARM_CLIENT_ID=appId M_ARM_CLIENT_SECRET=password M_ARM_SUBSCRIPTION_ID=subscriptionId M_ARM_TENANT_ID=tenantId
+  ```
+  Running those commands should create AKS service. You should verify in Azure Portal.
+* Extract kubeconfig following way:
+  ```shell
+  docker run --rm -v /tmp/shared:/shared -t epiphanyplatform/azks:latest kubeconfig
+  ```
+  This command will create file `/tmp/shared/kubeconfig`. You will need to move this file manually to `/tmp/shared/build/your-cluster-name/kubeconfig`. 
 
 # Build image
 
@@ -21,34 +45,9 @@ In main directory run:
 make build
 ```
 
-# Run module
-
-AKS and new subnet will be created in resource group and vnet from [AzBI Module](https://github.com/epiphany-platform/m-azure-basic-infrastructure) or You can join AKS to already existing subnet.
-
-* Initialize AzKS module in AzBI:
-  ```shell
-  docker run --rm -v /tmp/shared:/shared -t epiphanyplatform/azks:latest init
-  ```
-  or You can run AzKS module in already existing subnet: 
-  ```shell
-  docker run --rm -v /tmp/shared:/shared -t epiphanyplatform/azks:latest init M_RG_NAME="existing rg name" M_VNET_NAME="existing vnet name" M_SUBNET_NAME="existing subnet name"
-  ```
-  This commad will create configuration file of AzKS module in /tmp/shared/azks/azks-config.yml. You can investigate what is stored in that file. 
-* Plan and apply AzKS module:
-  ```shell
-  docker run --rm -v /tmp/shared:/shared -t epiphanyplatform/azks:latest plan M_ARM_CLIENT_ID=appId M_ARM_CLIENT_SECRET=password M_ARM_SUBSCRIPTION_ID=subscriptionId M_ARM_TENANT_ID=tenantId
-  docker run --rm -v /tmp/shared:/shared -t epiphanyplatform/azks:latest apply M_ARM_CLIENT_ID=appId M_ARM_CLIENT_SECRET=password M_ARM_SUBSCRIPTION_ID=subscriptionId M_ARM_TENANT_ID=tenantId
-  ```
-  Running those commands should create AKS service. You should verify in Azure Portal.
-* Share kubeconfig with `epicli` tool:
-  ```shell
-  docker run --rm -v /tmp/shared:/shared -t epiphanyplatform/azks:latest kubeconfig M_ARM_CLIENT_ID=appId M_ARM_CLIENT_SECRET=password M_ARM_SUBSCRIPTION_ID=subscriptionId M_ARM_TENANT_ID=tenantId
-  ```
-  This command will create file `/tmp/shared/kubeconfig`. You will need to move this file manually to `/tmp/shared/build/your-cluster-name/kubeconfig`. 
-
 # Run example
 
-You will run example of AzBI and AzKS module
+You can run example of AzBI and AzKS module using files in `examples` directory.
 
 ```shell
 cd examples/basic_flow
@@ -70,17 +69,17 @@ make all
 
 # Run example in existing subnet
 
-You will run example of AzKS module in existing subnet
+You can run example of AzKS in existing subnet using files in `examples` directory.
 
 ```shell
-cd examples/basic_flow
-ARM_CLIENT_ID="appId field" ARM_CLIENT_SECRET="password field" ARM_SUBSCRIPTION_ID="id field" ARM_TENANT_ID="tenant field" M_RG_NAME="existing rg name" M_SUBNET_NAME="existing subnet name" M_VNET_NAME="existing vnet name" EXISTING_SUBNET="true" make apply-only-azks
+cd examples/create_in_existing_subnet
+ARM_CLIENT_ID="appId field" ARM_CLIENT_SECRET="password field" ARM_SUBSCRIPTION_ID="id field" ARM_TENANT_ID="tenant field" M_RG_NAME="existing rg name" M_SUBNET_NAME="existing subnet name" M_VNET_NAME="existing vnet name" EXISTING_SUBNET="true" make all
 ```
 
 Or use config file with credentials:
 
 ```shell
-cd examples/basic_flow
+cd examples/create_in_existing_subnet
 cat >azure.mk <<'EOF'
 ARM_CLIENT_ID ?= "appId field"
 ARM_CLIENT_SECRET ?= "password field"
@@ -90,10 +89,10 @@ M_RG_NAME ?= "existing rg name"
 M_SUBNET_NAME ?= "existing subnet name"
 M_VNET_NAME ?= "existing vnet name"
 EOF
-make apply-only-azks
+make apply
 ```
 
-If You want to destroy the AKS, execute above instruction in the same way using destroy-only-azks command instead of apply-only-azks
+If You want to destroy the AKS, execute above instruction in the same way using `destroy` command instead of `all`.
 
 # Release module
 

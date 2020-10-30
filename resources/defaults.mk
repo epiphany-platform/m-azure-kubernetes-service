@@ -4,7 +4,7 @@ ifeq ($(M_SUBNET_NAME),)
 M_RG_NAME ?= $(M_NAME)-rg
 M_VNET_NAME ?= $(M_NAME)-vnet
 M_ADDRESS_PREFIX ?= 10.0.0.0/16
-M_SUBNET_NAME= undefined
+M_SUBNET_NAME ?= undefined
 else
 M_ADDRESS_PREFIX ?= undefined
 endif

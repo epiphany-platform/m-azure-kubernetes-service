@@ -9,10 +9,6 @@ VMS_RSA_FILENAME ?= vms_rsa
 
 export
 
-M_RG_NAME       ?= $(M_NAME)-rg
-M_VNET_NAME     ?= $(M_NAME)-vnet
-M_SUBNET_NAME   ?= undefined
-
 .PHONY: all clean init plan apply output destroy-plan destroy setup
 
 all: init plan apply
@@ -27,10 +23,7 @@ init: setup
 		M_VMS_COUNT=2 \
 		M_PUBLIC_IPS=false \
 		M_NAME=$(M_NAME) \
-		M_VMS_RSA=$(VMS_RSA_FILENAME) \
-		M_RG_NAME=$(M_RG_NAME) \
-		M_VNET_NAME=$(M_VNET_NAME) \
-		M_SUBNET_NAME=$(M_SUBNET_NAME)
+		M_VMS_RSA=$(VMS_RSA_FILENAME)
 
 plan: setup
 		@cd $(M_WORKDIR) && $(MAKE) plan \
