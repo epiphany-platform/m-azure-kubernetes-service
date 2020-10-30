@@ -6,7 +6,6 @@ variable "name" {
 variable "rg_name" {
   description = "Name of an resource group to deploy AKS cluster in"
   type        = string
-  default     = ""
 }
 
 variable "vnet_name" {
@@ -19,125 +18,75 @@ variable "address_prefix" {
   type        = string
 }
 
-# DEFAULT NODE-POOL
-
-variable "size" {
-  type = number
-}
-
-variable "min" {
-  type = number
-}
-
-variable "max" {
-  type = number
-}
-
-variable "vm_size" {
-  type = string
-}
-
-variable "disk_size" {
-  type = string
-}
-
-variable "auto_scaling" {
-  type = bool
-}
-
 variable "rsa_pub_path" {
   description = "Public ssh key path"
   type        = string
-  default     = "/shared/vms_rsa.pub"
 }
-
-# AUTO-SCALER PROFILE
-
-variable "balance_similar_node_groups" {
-  type    = bool
-  default = false
-}
-
-variable "max_graceful_termination_sec" {
-  type    = string
-  default = "600"
-}
-
-variable "scale_down_delay_after_add" {
-  type    = string
-  default = "10m"
-}
-
-variable "scale_down_delay_after_delete" {
-  type    = string
-  default = "10s"
-}
-
-variable "scale_down_delay_after_failure" {
-  type    = string
-  default = "10m"
-}
-
-variable "scan_interval" {
-  type    = string
-  default = "10s"
-}
-
-variable "scale_down_unneeded" {
-  type    = string
-  default = "10m"
-}
-
-variable "scale_down_unready" {
-  type    = string
-  default = "10m"
-}
-
-variable "scale_down_utilization_threshold" {
-  type    = string
-  default = "0.5"
-}
-
-# RANDOM DEFAULTS
 
 variable "kubernetes_version" {
   description = "Kubernetes version"
   type        = string
-  default     = "1.18.6"
 }
 
 variable "enable_node_public_ip" {
-  type    = bool
-  default = false
-}
-
-variable "default_node_pool_type" {
-  type    = string
-  default = "VirtualMachineScaleSets"
-}
-
-variable "identity_type" {
-  type    = string
-  default = "SystemAssigned"
+  description = "Whether to enable public IPs or not"
+  type        = bool
 }
 
 variable "network_plugin" {
-  type    = string
-  default = "azure"
+  description = "AKS network plugin"
+  type        = string
 }
 
 variable "network_policy" {
+  description = "AKS network policy"
   type    = string
-  default = "azure"
+}
+
+variable "enable_rbac" {
+  description = "Whether RBAC is enabled or not"
+  type    = bool
+}
+
+variable "default_node_pool" {
+  description = "Default node pool for AKS"
+  type = object({
+    size         = number
+    min          = number
+    max          = number
+    vm_size      = string
+    disk_size    = string
+    auto_scaling = bool
+    type         = string
+  })
+}
+
+variable "auto_scaler_profile" {
+  description = "Auto scaler profile"
+  type = object({
+    balance_similar_node_groups       = bool
+    max_graceful_termination_sec      = string
+    scale_down_delay_after_add        = string
+    scale_down_delay_after_delete     = string
+    scale_down_delay_after_failure    = string
+    scan_interval                     = string
+    scale_down_unneeded               = string
+    scale_down_unready                = string
+    scale_down_utilization_threshold  = string
+  })
+}
+
+variable "identity_type" {
+  description = "Identity type"
+  type    = string
 }
 
 variable "kube_dashboard_enabled" {
-  type    = bool
-  default = true
+  description = "Whether k8s dashboard is enabled or not"
+  type        = bool
 }
 
 variable "admin_username" {
   description = "Admin user on Linux OS"
   type        = string
-  default     = "operations"
 }

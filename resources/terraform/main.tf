@@ -24,16 +24,16 @@ resource "azurerm_kubernetes_cluster" "aks" {
 
   default_node_pool {
     name                  = "default"
-    node_count            = var.size
-    vm_size               = var.vm_size
+    node_count            = var.default_node_pool.size
+    vm_size               = var.default_node_pool.vm_size
     vnet_subnet_id        = azurerm_subnet.subnet.id
     orchestrator_version  = var.kubernetes_version
-    os_disk_size_gb       = var.disk_size
+    os_disk_size_gb       = var.default_node_pool.disk_size
     enable_node_public_ip = var.enable_node_public_ip
-    type                  = var.default_node_pool_type
-    enable_auto_scaling   = var.auto_scaling
-    min_count             = var.min
-    max_count             = var.max
+    type                  = var.default_node_pool.type
+    enable_auto_scaling   = var.default_node_pool.auto_scaling
+    min_count             = var.default_node_pool.min
+    max_count             = var.default_node_pool.max
   }
 
   identity {
@@ -55,6 +55,10 @@ resource "azurerm_kubernetes_cluster" "aks" {
     docker_bridge_cidr = "172.17.0.1/16"
   }
 
+  role_based_access_control {
+    enabled = var.enable_rbac
+  }
+
   addon_profile {
     kube_dashboard {
       enabled = var.kube_dashboard_enabled
@@ -62,15 +66,15 @@ resource "azurerm_kubernetes_cluster" "aks" {
   }
 
   auto_scaler_profile {
-    balance_similar_node_groups      = var.balance_similar_node_groups
-    max_graceful_termination_sec     = var.max_graceful_termination_sec
-    scale_down_delay_after_add       = var.scale_down_delay_after_add
-    scale_down_delay_after_delete    = var.scale_down_delay_after_delete
-    scale_down_delay_after_failure   = var.scale_down_delay_after_failure
-    scan_interval                    = var.scan_interval
-    scale_down_unneeded              = var.scale_down_unneeded
-    scale_down_unready               = var.scale_down_unready
-    scale_down_utilization_threshold = var.scale_down_utilization_threshold
+    balance_similar_node_groups      = var.auto_scaler_profile.balance_similar_node_groups
+    max_graceful_termination_sec     = var.auto_scaler_profile.max_graceful_termination_sec
+    scale_down_delay_after_add       = var.auto_scaler_profile.scale_down_delay_after_add
+    scale_down_delay_after_delete    = var.auto_scaler_profile.scale_down_delay_after_delete
+    scale_down_delay_after_failure   = var.auto_scaler_profile.scale_down_delay_after_failure
+    scan_interval                    = var.auto_scaler_profile.scan_interval
+    scale_down_unneeded              = var.auto_scaler_profile.scale_down_unneeded
+    scale_down_unready               = var.auto_scaler_profile.scale_down_unready
+    scale_down_utilization_threshold = var.auto_scaler_profile.scale_down_utilization_threshold
   }
 
   tags = {
