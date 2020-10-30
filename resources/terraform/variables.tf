@@ -1,8 +1,3 @@
-variable "existing_subnet" {
-	description = "Define if You want to deploy AKS in already existing subnet"
-	type        = bool
-}
-
 variable "subnet_name" {
 	description = "Name of the existing subnet to deploy AKS cluster in"
 	type        = string

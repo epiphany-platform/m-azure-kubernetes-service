@@ -1,17 +1,12 @@
 M_NAME ?= epiphany
 
-ifneq ($(M_EXISTING_SUBNET),true)
+ifeq ($(M_SUBNET_NAME),)
 M_RG_NAME ?= $(M_NAME)-rg
-M_VNET_NAME ?=$(M_NAME)-vnet
+M_VNET_NAME ?= $(M_NAME)-vnet
 M_ADDRESS_PREFIX ?= 10.0.0.0/16
-M_SUBNET_NAME ?= $(M_NAME)-snet-aks
-M_EXISTING_SUBNET ?= false
+M_SUBNET_NAME= undefined
 else
-M_RG_NAME ?= unset
-M_VNET_NAME ?= unset
-M_ADDRESS_PREFIX ?= unknown
-M_SUBNET_NAME ?= unset
-M_EXISTING_SUBNET ?= true
+M_ADDRESS_PREFIX ?= undefined
 endif
 
 # default node pool

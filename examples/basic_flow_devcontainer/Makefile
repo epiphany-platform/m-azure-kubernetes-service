@@ -9,12 +9,9 @@ VMS_RSA_FILENAME ?= vms_rsa
 
 export
 
-# replace the value to true if You want to deploy AKS in existing subnet
-EXISTING_SUBNET ?= false
-
 M_RG_NAME       ?= $(M_NAME)-rg
 M_VNET_NAME     ?= $(M_NAME)-vnet
-M_SUBNET_NAM    ?= $(M_NAME)-snet-aks
+M_SUBNET_NAME   ?= undefined
 
 .PHONY: all clean init plan apply output destroy-plan destroy setup
 
@@ -33,8 +30,7 @@ init: setup
 		M_VMS_RSA=$(VMS_RSA_FILENAME) \
 		M_RG_NAME=$(M_RG_NAME) \
 		M_VNET_NAME=$(M_VNET_NAME) \
-		M_SUBNET_NAME=$(M_SUBNET_NAME) \
-		M_EXISTING_SUBNET=$(EXISTING_SUBNET)
+		M_SUBNET_NAME=$(M_SUBNET_NAME)
 
 plan: setup
 		@cd $(M_WORKDIR) && $(MAKE) plan \

@@ -23,6 +23,33 @@ make build
 
 # Run module
 
+AKS and new subnet will be created in resource group and vnet from [AzBI Module](https://github.com/epiphany-platform/m-azure-basic-infrastructure) or You can join AKS to already existing subnet.
+
+* Initialize AzKS module in AzBI:
+  ```shell
+  docker run --rm -v /tmp/shared:/shared -t epiphanyplatform/azks:latest init
+  ```
+  or You can run AzKS module in already existing subnet: 
+  ```shell
+  docker run --rm -v /tmp/shared:/shared -t epiphanyplatform/azks:latest init M_RG_NAME="existing rg name" M_VNET_NAME="existing vnet name" M_SUBNET_NAME="existing subnet name"
+  ```
+  This commad will create configuration file of AzKS module in /tmp/shared/azks/azks-config.yml. You can investigate what is stored in that file. 
+* Plan and apply AzKS module:
+  ```shell
+  docker run --rm -v /tmp/shared:/shared -t epiphanyplatform/azks:latest plan M_ARM_CLIENT_ID=appId M_ARM_CLIENT_SECRET=password M_ARM_SUBSCRIPTION_ID=subscriptionId M_ARM_TENANT_ID=tenantId
+  docker run --rm -v /tmp/shared:/shared -t epiphanyplatform/azks:latest apply M_ARM_CLIENT_ID=appId M_ARM_CLIENT_SECRET=password M_ARM_SUBSCRIPTION_ID=subscriptionId M_ARM_TENANT_ID=tenantId
+  ```
+  Running those commands should create AKS service. You should verify in Azure Portal.
+* Share kubeconfig with `epicli` tool:
+  ```shell
+  docker run --rm -v /tmp/shared:/shared -t epiphanyplatform/azks:latest kubeconfig M_ARM_CLIENT_ID=appId M_ARM_CLIENT_SECRET=password M_ARM_SUBSCRIPTION_ID=subscriptionId M_ARM_TENANT_ID=tenantId
+  ```
+  This command will create file `/tmp/shared/kubeconfig`. You will need to move this file manually to `/tmp/shared/build/your-cluster-name/kubeconfig`. 
+
+# Run example
+
+You will run example of AzBI and AzKS module
+
 ```shell
 cd examples/basic_flow
 ARM_CLIENT_ID="appId field" ARM_CLIENT_SECRET="password field" ARM_SUBSCRIPTION_ID="id field" ARM_TENANT_ID="tenant field" make all
@@ -41,7 +68,9 @@ EOF
 make all
 ```
 
-# Run module in existing subnet
+# Run example in existing subnet
+
+You will run example of AzKS module in existing subnet
 
 ```shell
 cd examples/basic_flow
@@ -60,7 +89,6 @@ ARM_TENANT_ID ?= "tenant field"
 M_RG_NAME ?= "existing rg name"
 M_SUBNET_NAME ?= "existing subnet name"
 M_VNET_NAME ?= "existing vnet name"
-EXISTING_SUBNET ?= "true"
 EOF
 make apply-only-azks
 ```
