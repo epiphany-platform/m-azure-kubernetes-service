@@ -123,12 +123,7 @@ function init-2-5-autoscaled-aks() {
     M_NAME=azks-module-tests \
     M_VMS_RSA=test_vms_rsa \
     M_ADDRESS_PREFIX=10.0.0.0/16 \
-    M_SIZE=2 \
-    M_MIN=2 \
-    M_MAX=5 \
-    M_VM_SIZE=Standard_DS2_v2 \
-    M_DISK_SIZE=40 \
-    M_AUTO_SCALING=true
+    M_DEFAULT_NODE_POOL="{ size: 2, min: 2, max: 5, vm_size: Standard_DS2_v2, disk_size: 40, auto_scaling: true, type: VirtualMachineScaleSets }"
 }
 
 function check-2-5-autoscaled-aks-config-content() {
