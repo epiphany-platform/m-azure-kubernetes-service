@@ -4,7 +4,7 @@ azks:
   rg_name: azks-module-tests-rg
   vnet_name: azks-module-tests-vnet
   address_prefix: 10.0.0.1/16
-  subnet_name: undefined
+  subnet_name: unset
 
   # default node pool
   size: 2

@@ -14,23 +14,23 @@ az ad sp create-for-rbac --role="Contributor" --scopes="/subscriptions/SUBSCRIPT
 ```
 # Run module
 
-AzKS and new subnet will be created in resource group and vnet from [AzBI Module](https://github.com/epiphany-platform/m-azure-basic-infrastructure) or you can create AzKS in already existing subnet.
+The AzKS cluster and new subnet will be created in the resource group and vnet from the [AzBI Module](https://github.com/epiphany-platform/m-azure-basic-infrastructure) or you can create the AzKS cluster in an already existing subnet.
 
-* Initialize AzKS module in [AzBI Module](https://github.com/epiphany-platform/m-azure-basic-infrastructure) (without parameters it will extract some knowledge from status file):
+* Initialize the AzKS module in [AzBI Module](https://github.com/epiphany-platform/m-azure-basic-infrastructure) (without parameters it will extract some knowledge from the status file):
   ```shell
   docker run --rm -v /tmp/shared:/shared -t epiphanyplatform/azks:latest init
   ```
-  or initialize AzKS module with some parameters (ie.: in already existing subnet by setting `M_SUBNET_NAME`):
+  or initialize the AzKS module with some parameters (ie.: in already existing subnet by setting `M_SUBNET_NAME`):
   ```shell
   docker run --rm -v /tmp/shared:/shared -t epiphanyplatform/azks:latest init M_RG_NAME="demo-ropu-rg" M_VNET_NAME="demo-ropu-vnet" M_SUBNET_NAME="demo-ropu-kubernetes-master-subnet-0"
   ```
-  Previous command created configuration file of AzKS module in `/tmp/shared/azks/azks-config.yml`. You can investigate what is stored in that file and change it at will.
+  The previous command created a configuration file of the AzKS module in `/tmp/shared/azks/azks-config.yml`. You can investigate what is stored in that file and change it at will.
 * Plan and apply AzKS module:
   ```shell
   docker run --rm -v /tmp/shared:/shared -t epiphanyplatform/azks:latest plan M_ARM_CLIENT_ID=appId M_ARM_CLIENT_SECRET=password M_ARM_SUBSCRIPTION_ID=subscriptionId M_ARM_TENANT_ID=tenantId
   docker run --rm -v /tmp/shared:/shared -t epiphanyplatform/azks:latest apply M_ARM_CLIENT_ID=appId M_ARM_CLIENT_SECRET=password M_ARM_SUBSCRIPTION_ID=subscriptionId M_ARM_TENANT_ID=tenantId
   ```
-  Running those commands should create AzKS service. You should verify in Azure Portal.
+  Running those commands should create the AzKS service. You should verify in Azure Portal.
 * Extract kubeconfig following way:
   ```shell
   docker run --rm -v /tmp/shared:/shared -t epiphanyplatform/azks:latest kubeconfig
@@ -47,7 +47,7 @@ make build
 
 # Run example
 
-You can run example of AzBI and AzKS module using files in `examples` directory.
+You can run example of AzBI and AzKS module using files in the `examples` directory.
 
 ```shell
 cd examples/basic_flow
