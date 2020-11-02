@@ -41,8 +41,6 @@ M_ARM_TENANT_ID ?= unset
 # other parameters
 M_K8S_VERSION ?= 1.18.8
 M_PUBLIC_IP_ENABLED ?= false
-M_NETWORK_PLUGIN ?= azure
-M_NETWORK_POLICY ?= azure
 M_RBAC_ENABLED ?= false
 M_AZURE_AD ?= null
 M_IDENTITY_TYPE ?= SystemAssigned

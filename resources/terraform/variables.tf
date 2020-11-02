@@ -36,11 +36,13 @@ variable "enable_node_public_ip" {
 variable "network_plugin" {
   description = "AKS network plugin"
   type        = string
+  default     = "azure"
 }
 
 variable "network_policy" {
   description = "AKS network policy"
   type        = string
+  default     = "calico"
 }
 
 variable "enable_rbac" {

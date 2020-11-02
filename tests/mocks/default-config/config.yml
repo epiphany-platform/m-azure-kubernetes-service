@@ -6,8 +6,6 @@ azks:
   address_prefix: 10.0.0.0/16
   kubernetes_version: 1.18.8
   enable_node_public_ip: false
-  network_plugin: azure
-  network_policy: azure
   enable_rbac: false
   azure_ad: null
   default_node_pool:

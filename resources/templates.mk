@@ -16,8 +16,6 @@ $(M_MODULE_SHORT):
   address_prefix: $(M_ADDRESS_PREFIX)
   kubernetes_version: $(M_K8S_VERSION)
   enable_node_public_ip: $(M_PUBLIC_IP_ENABLED)
-  network_plugin: $(M_NETWORK_PLUGIN)
-  network_policy: $(M_NETWORK_PLUGIN)
   enable_rbac: $(M_RBAC_ENABLED)
   azure_ad: $(M_AZURE_AD)
   default_node_pool: $(M_DEFAULT_NODE_POOL)
