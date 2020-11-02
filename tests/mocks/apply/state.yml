@@ -10,6 +10,7 @@ azks:
   network_plugin: azure
   network_policy: azure
   enable_rbac: false
+  azure_ad: null
   default_node_pool:
     size: 2
     min: 2

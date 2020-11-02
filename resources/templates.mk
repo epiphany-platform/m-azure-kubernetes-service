@@ -19,6 +19,7 @@ $(M_MODULE_SHORT):
   network_plugin: $(M_NETWORK_PLUGIN)
   network_policy: $(M_NETWORK_PLUGIN)
   enable_rbac: $(M_RBAC_ENABLED)
+  azure_ad: $(M_AZURE_AD)
   default_node_pool: $(M_DEFAULT_NODE_POOL)
   auto_scaler_profile: $(M_AUTO_SCALER_PROFILE)
   rsa_pub_path: "$(M_SHARED)/$(M_VMS_RSA).pub"

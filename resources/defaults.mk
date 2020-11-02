@@ -44,6 +44,7 @@ M_PUBLIC_IP_ENABLED ?= false
 M_NETWORK_PLUGIN ?= azure
 M_NETWORK_POLICY ?= azure
 M_RBAC_ENABLED ?= false
+M_AZURE_AD ?= null
 M_IDENTITY_TYPE ?= SystemAssigned
 M_K8S_DASHBOARD_ENABLED ?= true
 M_ADMIN_USERNAME ?= operations

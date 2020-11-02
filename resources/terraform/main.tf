@@ -57,6 +57,14 @@ resource "azurerm_kubernetes_cluster" "aks" {
 
   role_based_access_control {
     enabled = var.enable_rbac
+    dynamic "azure_active_directory" {
+      for_each = var.azure_ad == null ? [] : [var.azure_ad]
+      content {
+        managed                = azure_active_directory.managed
+        tenant_id              = azure_active_directory.tenant_id
+        admin_group_object_ids = azure_active_directory.admin_group_object_ids
+      }
+    }
   }
 
   addon_profile {

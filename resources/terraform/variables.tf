@@ -76,6 +76,15 @@ variable "auto_scaler_profile" {
   })
 }
 
+variable "azure_ad" {
+  description = "Azure Active Directory settings"
+  type = object({
+    managed                = bool
+    tenant_id              = string
+    admin_group_object_ids = list(string)
+  })
+}
+
 variable "identity_type" {
   description = "Identity type"
   type        = string
