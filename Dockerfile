@@ -14,12 +14,7 @@ ENTRYPOINT ["make"]
 
 RUN apk add --update --no-cache make=4.3-r0 &&\
     wget https://github.com/mikefarah/yq/releases/download/3.3.4/yq_linux_amd64 -O /usr/bin/yq &&\
-    chmod +x /usr/bin/yq &&\
-    # Python is installed to resolve yq issue
-    # https://github.com/mikefarah/yq/issues/561
-    apk add --update --no-cache python3 && ln -sf python3 /usr/bin/python &&\
-    python3 -m ensurepip &&\
-    pip3 install --no-cache --upgrade pip setuptools pyaml
+    chmod +x /usr/bin/yq
 
 ARG ARG_M_VERSION="unknown"
 ENV M_VERSION=$ARG_M_VERSION
