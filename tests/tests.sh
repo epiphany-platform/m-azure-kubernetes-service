@@ -115,7 +115,7 @@ function check-default-config-content() {
 function init-2-5-autoscaled-aks() {
   echo "# prepare test state file"
   cp "$TESTS_DIR"/tests/mocks/config-with-variables/state.yml "$TESTS_DIR"/shared/
-  echo "#	will initialize config with \"docker run ... init M_NAME=azks-module-tests M_VMS_RSA=test_vms_rsa M_ADDRESS_PREFIX=10.0.0.0/16 M_SIZE=2 M_MIN=2 M_MAX=5 M_VM_SIZE=Standard_DS2_v2 M_DISK_SIZE=40 M_AUTO_SCALING=true command\""
+  echo "#	will initialize config with \"docker run ... init M_NAME=azks-module-tests M_VMS_RSA=test_vms_rsa M_ADDRESS_PREFIX=10.0.0.0/16 M_SIZE=2 M_MIN=2 M_MAX=5 M_VM_SIZE=Standard_DS2_v2 M_DISK_SIZE=36 M_AUTO_SCALING=true command\""
   docker run --rm \
     -v "$MOUNT_DIR"/shared:/shared \
     -t "$1" \
@@ -127,7 +127,7 @@ function init-2-5-autoscaled-aks() {
     M_MIN=2 \
     M_MAX=5 \
     M_VM_SIZE=Standard_DS2_v2 \
-    M_DISK_SIZE=40 \
+    M_DISK_SIZE=36 \
     M_AUTO_SCALING=true
 }
 
