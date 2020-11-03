@@ -20,6 +20,7 @@ $(M_MODULE_SHORT):
   azure_ad: $(M_AZURE_AD)
   default_node_pool: $(M_DEFAULT_NODE_POOL)
   auto_scaler_profile: $(M_AUTO_SCALER_PROFILE)
+  subnet_name: $(M_SUBNET_NAME)
   rsa_pub_path: "$(M_SHARED)/$(M_VMS_RSA).pub"
   identity_type: $(M_IDENTITY_TYPE)
   kube_dashboard_enabled: $(M_K8S_DASHBOARD_ENABLED)

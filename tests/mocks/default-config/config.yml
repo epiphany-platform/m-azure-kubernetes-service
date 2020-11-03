@@ -26,6 +26,7 @@ azks:
     scale_down_unneeded: 10m
     scale_down_unready: 10m
     scale_down_utilization_threshold: 0.5
+  subnet_name: unset
   rsa_pub_path: /shared/vms_rsa.pub
   identity_type: SystemAssigned
   kube_dashboard_enabled: true

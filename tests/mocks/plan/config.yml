@@ -13,7 +13,7 @@ azks:
     min: 2
     max: 5
     vm_size: Standard_DS2_v2
-    disk_size: 40
+    disk_size: 36
     auto_scaling: true
     type: VirtualMachineScaleSets
   auto_scaler_profile:
@@ -26,6 +26,7 @@ azks:
     scale_down_unneeded: 10m
     scale_down_unready: 10m
     scale_down_utilization_threshold: 0.5
+  subnet_name: unset
   rsa_pub_path: /shared/test_vms_rsa.pub
   identity_type: SystemAssigned
   kube_dashboard_enabled: true
