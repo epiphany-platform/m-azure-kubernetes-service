@@ -14,16 +14,16 @@ $(M_MODULE_SHORT):
   rg_name: $(M_RG_NAME)
   vnet_name: $(M_VNET_NAME)
   address_prefix: $(M_ADDRESS_PREFIX)
+  kubernetes_version: $(M_K8S_VERSION)
+  enable_node_public_ip: $(M_PUBLIC_IP_ENABLED)
+  enable_rbac: $(M_RBAC_ENABLED)
+  azure_ad: $(M_AZURE_AD)
+  default_node_pool: $(M_DEFAULT_NODE_POOL)
+  auto_scaler_profile: $(M_AUTO_SCALER_PROFILE)
   subnet_name: $(M_SUBNET_NAME)
-
-  # default node pool
-  size: $(M_SIZE)
-  min: $(M_MIN)
-  max: $(M_MAX)
-  vm_size: $(M_VM_SIZE)
-  disk_size: $(M_DISK_SIZE)
-  auto_scaling: $(M_AUTO_SCALING)
   rsa_pub_path: "$(M_SHARED)/$(M_VMS_RSA).pub"
+  kube_dashboard_enabled: $(M_K8S_DASHBOARD_ENABLED)
+  admin_username: $(M_ADMIN_USERNAME)
 endef
 
 define M_STATE_INITIAL
