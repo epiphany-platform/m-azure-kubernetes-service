@@ -2,7 +2,7 @@
 
 Epiphany Module: Azure Kubernetes Service
 
-# Prepare service principal
+## Prepare service principal
 
 Have a look [here](https://www.terraform.io/docs/providers/azurerm/guides/service_principal_client_secret.html).
 
@@ -12,7 +12,8 @@ az account list #get subscription from id field
 az account set --subscription="SUBSCRIPTION_ID"
 az ad sp create-for-rbac --role="Contributor" --scopes="/subscriptions/SUBSCRIPTION_ID" --name="SOME_MEANINGFUL_NAME" #get appID, password, tenant, name and displayName
 ```
-# Run module
+
+## Run module
 
 The AzKS cluster and new subnet will be created in the resource group and vnet from the [AzBI Module](https://github.com/epiphany-platform/m-azure-basic-infrastructure) or you can create the AzKS cluster in an already existing subnet.
 
@@ -37,7 +38,7 @@ The AzKS cluster and new subnet will be created in the resource group and vnet f
   ```
   This command will create file `/tmp/shared/kubeconfig`. You will need to move this file manually to `/tmp/shared/build/your-cluster-name/kubeconfig`.
 
-# Build image
+## Build image
 
 In main directory run:
 
@@ -45,7 +46,7 @@ In main directory run:
 make build
 ```
 
-# Run example
+## Run example
 
 You can run example of AzBI and AzKS module using files in the `examples` directory.
 
@@ -67,7 +68,7 @@ EOF
 make all
 ```
 
-# Run example in existing subnet
+## Run example in existing subnet
 
 You can run example of AzKS in existing subnet using files in `examples` directory.
 
@@ -94,7 +95,7 @@ make apply
 
 If You want to destroy the AzKS, execute above instruction in the same way using `destroy` command instead of `all`.
 
-# Release module
+## Release module
 
 ```shell
 make release
@@ -106,13 +107,13 @@ or if you want to set different version number:
 make release VERSION=number_of_your_choice
 ```
 
-# Run tests
+## Run tests
 
 ```
 make test
 ```
 
-# Run tests in Kubernetes based build system
+## Run tests in Kubernetes based build system
 
 Kubernetes based build system means that build agents work inside Kubernetes cluster. During testing process application runs inside docker container. This means that we've got "docker inside docker (DiD)". This kind of environment requires a bit different configuration of mount shared storage to docker container than with standard one-layer configuration.
 
@@ -153,7 +154,11 @@ make test
 
 5. Test results will be availabe inside ```/tests-share``` on pod on which tests are running and is mapped to ```/tmp/tests-share``` on kubernetes node.
 
-# Windows users
+## Input parameters
+
+To check supported module parameters list navigate to [inputs](docs/INPUTS.md) document.
+
+## Windows users
 
 This module is designed for Linux/Unix development/usage only. If you need to develop from Windows you can use the included [devcontainer setup for VScode](https://code.visualstudio.com/docs/remote/containers-tutorial) and run the examples the same way but then from then ```examples/basic_flow_devcontainer``` folder.
 
