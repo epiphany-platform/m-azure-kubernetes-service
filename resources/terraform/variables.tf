@@ -1,3 +1,8 @@
+variable "subnet_name" {
+	description = "Name of the existing subnet to deploy AKS cluster in"
+	type        = string
+}
+
 variable "name" {
   description = "Prefix for resource names"
   type        = string
