@@ -28,6 +28,5 @@ azks:
     scale_down_utilization_threshold: 0.5
   subnet_name: unset
   rsa_pub_path: /shared/vms_rsa.pub
-  identity_type: SystemAssigned
   kube_dashboard_enabled: true
   admin_username: operations

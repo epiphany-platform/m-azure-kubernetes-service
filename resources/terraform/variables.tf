@@ -1,8 +1,3 @@
-variable "subnet_name" {
-	description = "Name of the existing subnet to deploy AKS cluster in"
-	type        = string
-}
-
 variable "name" {
   description = "Prefix for resource names"
   type        = string
@@ -21,6 +16,11 @@ variable "vnet_name" {
 variable "address_prefix" {
   description = "SubNetwork address space for AKS"
   type        = string
+}
+
+variable "subnet_name" {
+	description = "Name of the existing subnet to deploy AKS cluster in"
+	type        = string
 }
 
 variable "rsa_pub_path" {
@@ -93,8 +93,9 @@ variable "azure_ad" {
 }
 
 variable "identity_type" {
-  description = "Identity type"
+  description = "The type of identity used for the managed cluster"
   type        = string
+  default     = "SystemAssigned"
 }
 
 variable "kube_dashboard_enabled" {
