@@ -156,7 +156,7 @@ make test
 
 ## Input parameters
 
-To check supported module parameters list navigate to [inputs](docs/INPUTS.md) document.
+To check supported module parameters list navigate to [inputs](docs/INPUTS.adoc) document.
 
 ## Windows users
 

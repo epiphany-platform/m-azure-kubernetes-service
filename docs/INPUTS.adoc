@@ -37,7 +37,7 @@ not
 
 |M_DEFAULT_NODE_POOL |map
 |
-[source,json]
+[source]
 ----
 {
   size: 2,
@@ -53,7 +53,7 @@ not
 
 |M_AUTO_SCALER_PROFILE |map
 |
-[source,json]
+[source]
 ----
 {
   balance_similar_node_groups: false,
@@ -72,7 +72,7 @@ specification
 
 |M_AZURE_AD |map |null |no
 |Azure Active Directory settings. Format:
-[source,json]
+[source]
 ----
 {
   managed: bool,
