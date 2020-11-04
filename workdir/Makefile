@@ -127,7 +127,7 @@ template-tfvars:
 template-config-file:
 	#AzKS | template-config-file | will template config file (and backup previous if exists)
 	@if test -f $(M_SHARED)/$(M_MODULE_SHORT)/$(M_CONFIG_NAME); then mv $(M_SHARED)/$(M_MODULE_SHORT)/$(M_CONFIG_NAME) $(M_SHARED)/$(M_MODULE_SHORT)/$(M_CONFIG_NAME).backup ; fi
-	@echo "$$M_CONFIG_CONTENT" > $(M_SHARED)/$(M_MODULE_SHORT)/$(M_CONFIG_NAME)
+	@echo "$$M_CONFIG_CONTENT" | yq r --unwrapScalar -p pv -P - '*' > $(M_SHARED)/$(M_MODULE_SHORT)/$(M_CONFIG_NAME)
 	#AzKS | template-config-file | will replace arguments with values from state file
 	@yq r $(M_SHARED)/$(M_STATE_FILE_NAME) 'azbi.output[rg_name.value]' \
 	| xargs -r yq w -i $(M_SHARED)/$(M_MODULE_SHORT)/$(M_CONFIG_NAME) '$(M_MODULE_SHORT).rg_name'
