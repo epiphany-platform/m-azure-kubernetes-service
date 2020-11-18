@@ -1,5 +1,5 @@
 AZBI := epiphanyplatform/azbi:0.0.1
-AZKS := epiphanyplatform/azks:0.0.1
+AZKS := epiphanyplatform/azks:0.0.2
 
 #makes it easier to replace the value
 M_NAME            ?= mop-module-tests
