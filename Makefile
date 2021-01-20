@@ -64,6 +64,9 @@ guard-%:
 		exit 1; \
 	fi
 
+print-%:
+	@echo "$($*)"
+
 doctor:
 	go mod tidy
 	go fmt ./...

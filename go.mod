@@ -3,12 +3,10 @@ module github.com/epiphany-platform/m-azure-kubernetes-service
 go 1.15
 
 //TODO fix
-replace (
-        github.com/epiphany-platform/e-structures => ../../epiphany-platform/e-structures
-)
+replace github.com/epiphany-platform/e-structures => ../../epiphany-platform/e-structures
 
 require (
-	github.com/epiphany-platform/e-structures v0.0.5 // indirect
+	github.com/epiphany-platform/e-structures v0.0.5
 	github.com/magiconair/properties v1.8.4 // indirect
 	github.com/pelletier/go-toml v1.8.1 // indirect
 	github.com/rs/zerolog v1.20.0
