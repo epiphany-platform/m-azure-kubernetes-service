@@ -66,7 +66,7 @@ jobs:
           failTaskOnFailedTests: true
 
   - job: Publish
-    dependsOn: Test
+    dependsOn: Build_and_Test
     condition: and(succeeded(), eq(variables['build.sourceBranch'], 'refs/heads/develop'))
     steps:
       - task: Bash@3
