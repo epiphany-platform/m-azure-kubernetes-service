@@ -16,7 +16,7 @@ variables:
   ver: dev
 
 jobs:
-  - job: Build and Test
+  - job: Build_and_Test
     steps:
       - task: GoTool@0
         displayName: 'ensure Go 1.15.2'
