@@ -28,6 +28,9 @@ func loadState(path string) (*st.State, error) {
 		if err != nil {
 			return nil, err
 		}
+		if state.AzKS == nil {
+			state.AzKS = &st.AzKSState{}
+		}
 		return state, nil
 	}
 }

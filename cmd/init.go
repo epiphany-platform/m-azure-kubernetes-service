@@ -54,8 +54,8 @@ var initCmd = &cobra.Command{
 			logger.Fatal().Err(err)
 		}
 
-		if !reflect.DeepEqual(state.AzBI, &st.AzKSState{}) && state.AzKS.Status != st.Initialized && state.AzKS.Status != st.Destroyed {
-			logger.Fatal().Err(errors.New(string("unexpected state: " + state.AzBI.Status)))
+		if !reflect.DeepEqual(state.AzKS, &st.AzKSState{}) && state.AzKS.Status != st.Initialized && state.AzKS.Status != st.Destroyed {
+			logger.Fatal().Err(errors.New(string("unexpected state: " + state.AzKS.Status)))
 		}
 
 		logger.Debug().Msg("backup state file")
@@ -71,6 +71,8 @@ var initCmd = &cobra.Command{
 
 		config.Params.Name = to.StrPtr(name)
 		config.Params.RsaPublicKeyPath = to.StrPtr(filepath.Join(SharedDirectory, fmt.Sprintf("%s.pub", vmsRsaPath)))
+
+		//TODO get all the AzBI output and put here
 
 		state.AzKS.Status = st.Initialized
 
