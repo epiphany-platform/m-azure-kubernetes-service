@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"errors"
 	azks "github.com/epiphany-platform/e-structures/azks/v0"
 	st "github.com/epiphany-platform/e-structures/state/v0"
 	"io/ioutil"
@@ -93,4 +94,25 @@ func backupFile(path string) error {
 		}
 		return nil
 	}
+}
+
+func checkAndLoad(stateFilePath string, configFilePath string) (*azks.Config, *st.State, error) {
+	if _, err := os.Stat(stateFilePath); os.IsNotExist(err) {
+		return nil, nil, errors.New("state file does not exist, please run init first")
+	}
+	if _, err := os.Stat(configFilePath); os.IsNotExist(err) {
+		return nil, nil, errors.New("config file does not exist, please run init first")
+	}
+
+	state, err := loadState(stateFilePath)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	config, err := loadConfig(configFilePath)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return config, state, nil
 }

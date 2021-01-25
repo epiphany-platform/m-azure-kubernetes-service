@@ -7,7 +7,10 @@ replace github.com/epiphany-platform/e-structures => ../../epiphany-platform/e-s
 
 require (
 	github.com/epiphany-platform/e-structures v0.0.5
+	github.com/google/go-cmp v0.5.3
+	github.com/jinzhu/copier v0.2.3
 	github.com/magiconair/properties v1.8.4 // indirect
+	github.com/mkyc/go-terraform v0.0.7
 	github.com/pelletier/go-toml v1.8.1 // indirect
 	github.com/rs/zerolog v1.20.0
 	github.com/spf13/afero v1.4.1 // indirect
