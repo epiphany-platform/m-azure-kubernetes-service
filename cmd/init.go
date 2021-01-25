@@ -13,8 +13,12 @@ import (
 )
 
 var (
+	omitState bool
+
 	name       string
 	vmsRsaPath string
+
+	rgName string
 )
 
 // initCmd represents the init command
@@ -32,6 +36,7 @@ var initCmd = &cobra.Command{
 
 		name = viper.GetString("name")
 		vmsRsaPath = viper.GetString("vms_rsa")
+		rgName = viper.GetString("rg_name")
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		logger.Debug().Msg("init called")
@@ -71,8 +76,39 @@ var initCmd = &cobra.Command{
 
 		config.Params.Name = to.StrPtr(name)
 		config.Params.RsaPublicKeyPath = to.StrPtr(filepath.Join(SharedDirectory, fmt.Sprintf("%s.pub", vmsRsaPath)))
+		config.Params.RgName = to.StrPtr(rgName)
 
-		//TODO get all the AzBI output and put here
+		//initialize configuration using values from AzBIState
+		if !omitState {
+			if state.GetAzBIState().Status == st.Applied {
+				if state.GetAzBIState().GetConfig().GetParams().GetNameV() != "" {
+					config.GetParams().Name = to.StrPtr(state.GetAzBIState().GetConfig().GetParams().GetNameV())
+					fmt.Println("Found and used 'name' parameter in existing AzBI configuration.")
+				}
+				if state.GetAzBIState().GetConfig().GetParams().GetRsaPublicKeyV() != "" {
+					config.GetParams().RsaPublicKeyPath = to.StrPtr(state.GetAzBIState().GetConfig().GetParams().GetRsaPublicKeyV())
+					fmt.Println("Found and used 'vms_rsa' parameter in existing AzBI configuration.")
+				}
+				if state.GetAzBIState().GetConfig().GetParams().GetLocationV() != "" {
+					config.GetParams().Location = to.StrPtr(state.GetAzBIState().GetConfig().GetParams().GetLocationV())
+					fmt.Println("Found and used 'location' parameter in existing AzBI configuration.")
+				}
+				if state.GetAzBIState().GetOutput().GetRgNameV() != "" {
+					config.GetParams().RgName = to.StrPtr(state.GetAzBIState().GetOutput().GetRgNameV())
+					fmt.Println("Found and used 'rg_name' parameter in existing AzBI output.")
+				}
+				if state.GetAzBIState().GetOutput().GetVnetNameV() != "" {
+					config.GetParams().VnetName = to.StrPtr(state.GetAzBIState().GetOutput().GetVnetNameV())
+					fmt.Println("Found and used 'vnet_name' parameter in existing AzBI output.")
+				}
+				for _, s := range state.GetAzBIState().GetConfig().GetParams().ExtractEmptySubnets() {
+					if *s.Name == "azks" || *s.Name == "kubernetes" || *s.Name == "aks" {
+						config.GetParams().SubnetName = s.Name
+						fmt.Println("Found and used 'subnet.name' parameter in existing AzBI configuration.")
+					}
+				}
+			}
+		}
 
 		state.AzKS.Status = st.Initialized
 
@@ -99,6 +135,10 @@ var initCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(initCmd)
 
+	initCmd.Flags().BoolVarP(&omitState, "omit_state", "o", false, "omit state values during initialization")
+
 	initCmd.Flags().String("name", "epiphany", "prefix given to all resources created") //TODO rename to prefix
 	initCmd.Flags().String("vms_rsa", "vms_rsa", "name of rsa keypair to be provided to machines")
+
+	initCmd.Flags().String("rg_name", "epiphany-rg", "name of Azure Resource Group to be used")
 }
