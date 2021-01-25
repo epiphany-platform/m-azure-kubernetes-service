@@ -116,3 +116,11 @@ func checkAndLoad(stateFilePath string, configFilePath string) (*azks.Config, *s
 
 	return config, state, nil
 }
+
+func produceOutput(m map[string]interface{}) *azks.Output {
+	logger.Debug().Msgf("Received output map: %#v", m)
+
+	//TODO implement
+
+	return &azks.Output{}
+}

@@ -152,6 +152,53 @@ func terraformPlanDestroy() string {
 	return output
 }
 
+func terraformApply() (string, error) {
+	logger.Debug().Msg("terraformApply")
+
+	options, err := terra.WithDefaultRetryableErrors(&terra.Options{
+		TerraformDir: filepath.Join(ResourcesDirectory, terraformDir),
+		EnvVars: map[string]string{
+			"TF_IN_AUTOMATION":    "true",
+			"ARM_CLIENT_ID":       clientId,
+			"ARM_CLIENT_SECRET":   clientSecret,
+			"ARM_SUBSCRIPTION_ID": subscriptionId,
+			"ARM_TENANT_ID":       tenantId,
+		},
+		PlanFilePath:  filepath.Join(SharedDirectory, moduleShortName, applyTfPlanFile),
+		StateFilePath: filepath.Join(SharedDirectory, moduleShortName, tfStateFile),
+		NoColor:       true,
+		Logger:        ZeroLogger{},
+	})
+	if err != nil {
+		return "", err
+	}
+	output, err := terra.Apply(options)
+	if err != nil {
+		return output, err
+	}
+	return output, nil
+}
+
+func getTerraformOutputMap() (map[string]interface{}, error) {
+	logger.Debug().Msg("getTerraformOutputMap")
+	options, err := terra.WithDefaultRetryableErrors(&terra.Options{
+		TerraformDir: filepath.Join(ResourcesDirectory, terraformDir),
+		EnvVars: map[string]string{
+			"TF_IN_AUTOMATION": "true",
+		},
+		StateFilePath: filepath.Join(SharedDirectory, moduleShortName, tfStateFile),
+		Logger:        ZeroLogger{},
+	})
+	if err != nil {
+		return nil, err
+	}
+	outputMap, err := terra.OutputAll(options)
+	if err != nil {
+		return nil, err
+	}
+	return outputMap, nil
+}
+
 func count(output string) (string, error) {
 	resourceCount, err := terra.Count(output)
 	if err != nil {
