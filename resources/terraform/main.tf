@@ -8,18 +8,9 @@ data "azurerm_virtual_network" "vnet" {
 }
 
 data "azurerm_subnet" "subnet" {
-  count                = var.subnet_name != "unset" ? 1 : 0
   name                 = var.subnet_name
   virtual_network_name = data.azurerm_virtual_network.vnet.name
   resource_group_name  = data.azurerm_resource_group.main_rg.name
-}
-
-resource "azurerm_subnet" "subnet" {
-  count                = var.subnet_name != "unset" ? 0 : 1
-  name                 = "${var.name}-snet-aks"
-  resource_group_name  = data.azurerm_resource_group.main_rg.name
-  virtual_network_name = data.azurerm_virtual_network.vnet.name
-  address_prefixes     = [ cidrsubnet(var.address_prefix, 8, 16) ]
 }
 
 resource "azurerm_kubernetes_cluster" "aks" {
@@ -34,7 +25,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
     name                  = "default"
     node_count            = var.default_node_pool.size
     vm_size               = var.default_node_pool.vm_size
-    vnet_subnet_id        = var.subnet_name != "unset" ? data.azurerm_subnet.subnet[0].id : azurerm_subnet.subnet[0].id
+    vnet_subnet_id        = data.azurerm_subnet.subnet.id
     orchestrator_version  = var.kubernetes_version
     os_disk_size_gb       = var.default_node_pool.disk_size
     enable_node_public_ip = var.enable_node_public_ip

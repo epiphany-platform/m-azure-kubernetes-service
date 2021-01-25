@@ -16,12 +16,6 @@ variable "vnet_name" {
   type        = string
 }
 
-//NOPE dont move it. Don't create Subnet on it's own.
-variable "address_prefix" {
-  description = "SubNetwork address space for AKS"
-  type        = string
-}
-
 //OK
 variable "subnet_name" {
 	description = "Name of the existing subnet to deploy AKS cluster in"
