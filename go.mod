@@ -6,8 +6,12 @@ go 1.15
 replace github.com/epiphany-platform/e-structures => ../../epiphany-platform/e-structures
 
 require (
+	github.com/Azure/azure-sdk-for-go v50.2.0+incompatible
+	github.com/Azure/go-autorest/autorest/azure/auth v0.5.6
 	github.com/epiphany-platform/e-structures v0.0.5
+	github.com/go-test/deep v1.0.7
 	github.com/google/go-cmp v0.5.3
+	github.com/gruntwork-io/terratest v0.31.5
 	github.com/jinzhu/copier v0.2.3
 	github.com/magiconair/properties v1.8.4 // indirect
 	github.com/mkyc/go-terraform v0.0.7
@@ -18,7 +22,9 @@ require (
 	github.com/spf13/cobra v1.1.1
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/viper v1.7.1
+	golang.org/x/crypto v0.0.0-20201221181555-eec23a3978ad
 	golang.org/x/sys v0.0.0-20201106081118-db71ae66460a // indirect
 	golang.org/x/text v0.3.4 // indirect
 	gopkg.in/ini.v1 v1.62.0 // indirect
+	gopkg.in/yaml.v2 v2.2.8
 )
