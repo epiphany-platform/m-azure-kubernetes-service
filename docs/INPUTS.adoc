@@ -31,6 +31,12 @@ Following table presents parameters which can be passed as command parameters (`
 
 |rg_name |string |epiphany-rg |no |init |Name of Azure Resource Group to be used
 
+|subnet_name |string |azks |no |init |Name of subnet to be used
+
+|vnet_name |string |epiphany-vnet |no |init |Name of vnet to be used
+
+|kubernetes_version |string |1.18.14 |no |init |Version of Kubernetes to be used
+
 |vms_rsa |string |vms_rsa |no |init |SSH key name, should be located in shared directory
 
 |omit_state |bool |false |no |init |omit state values during initialization

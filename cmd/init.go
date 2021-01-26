@@ -18,7 +18,10 @@ var (
 	name       string
 	vmsRsaPath string
 
-	rgName string
+	rgName     string
+	snName     string
+	vnetName   string
+	k8sVersion string
 )
 
 // initCmd represents the init command
@@ -37,6 +40,9 @@ var initCmd = &cobra.Command{
 		name = viper.GetString("name")
 		vmsRsaPath = viper.GetString("vms_rsa")
 		rgName = viper.GetString("rg_name")
+		snName = viper.GetString("subnet_name")
+		vnetName = viper.GetString("vnet_name")
+		k8sVersion = viper.GetString("kubernetes_version")
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		logger.Debug().Msg("init called")
@@ -74,9 +80,12 @@ var initCmd = &cobra.Command{
 			logger.Fatal().Err(err)
 		}
 
-		config.Params.Name = to.StrPtr(name)
-		config.Params.RsaPublicKeyPath = to.StrPtr(filepath.Join(SharedDirectory, fmt.Sprintf("%s.pub", vmsRsaPath)))
-		config.Params.RgName = to.StrPtr(rgName)
+		config.GetParams().Name = to.StrPtr(name)
+		config.GetParams().RsaPublicKeyPath = to.StrPtr(filepath.Join(SharedDirectory, fmt.Sprintf("%s.pub", vmsRsaPath)))
+		config.GetParams().RgName = to.StrPtr(rgName)
+		config.GetParams().SubnetName = to.StrPtr(snName)
+		config.GetParams().VnetName = to.StrPtr(vnetName)
+		config.GetParams().KubernetesVersion = to.StrPtr(k8sVersion)
 
 		//initialize configuration using values from AzBIState
 		if !omitState {
@@ -141,4 +150,8 @@ func init() {
 	initCmd.Flags().String("vms_rsa", "vms_rsa", "name of rsa keypair to be provided to machines")
 
 	initCmd.Flags().String("rg_name", "epiphany-rg", "name of Azure Resource Group to be used")
+	initCmd.Flags().String("subnet_name", "azks", "name of subnet to be used")
+	initCmd.Flags().String("vnet_name", "epiphany-vnet", "name of vnet to be used")
+
+	initCmd.Flags().String("kubernetes_version", "1.18.14", "version of kubernetes to be used")
 }
