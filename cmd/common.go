@@ -199,6 +199,41 @@ func getTerraformOutputMap() (map[string]interface{}, error) {
 	return outputMap, nil
 }
 
+func terraformDestroy() (string, error) {
+	logger.Debug().Msg("terraformDestroy")
+
+	options, err := terra.WithDefaultRetryableErrors(&terra.Options{
+		TerraformDir: filepath.Join(ResourcesDirectory, terraformDir),
+		EnvVars: map[string]string{
+			"TF_IN_AUTOMATION":      "true",
+			"TF_WARN_OUTPUT_ERRORS": "1",
+			"ARM_CLIENT_ID":         clientId,
+			"ARM_CLIENT_SECRET":     clientSecret,
+			"ARM_SUBSCRIPTION_ID":   subscriptionId,
+			"ARM_TENANT_ID":         tenantId,
+		},
+		PlanFilePath:  filepath.Join(SharedDirectory, moduleShortName, destroyTfPlanFile),
+		StateFilePath: filepath.Join(SharedDirectory, moduleShortName, tfStateFile),
+		NoColor:       true,
+		Logger:        ZeroLogger{},
+	})
+	if err != nil {
+		return "", err
+	}
+	output, err := terra.Apply(options)
+	if err != nil {
+		return output, err
+	}
+	return output, nil
+}
+
+func updateStateAfterDestroy(state *st.State) *st.State {
+	logger.Debug().Msg("updateStateAfterDestroy")
+	state.AzKS.Output = nil
+	state.AzKS.Status = st.Destroyed
+	return state
+}
+
 func count(output string) (string, error) {
 	resourceCount, err := terra.Count(output)
 	if err != nil {
