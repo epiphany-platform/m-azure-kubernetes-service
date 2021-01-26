@@ -4,6 +4,7 @@ import (
 	"errors"
 	azks "github.com/epiphany-platform/e-structures/azks/v0"
 	st "github.com/epiphany-platform/e-structures/state/v0"
+	"github.com/epiphany-platform/e-structures/utils/to"
 	"io/ioutil"
 	"os"
 )
@@ -120,7 +121,7 @@ func checkAndLoad(stateFilePath string, configFilePath string) (*azks.Config, *s
 func produceOutput(m map[string]interface{}) *azks.Output {
 	logger.Debug().Msgf("Received output map: %#v", m)
 
-	//TODO implement
-
-	return &azks.Output{}
+	return &azks.Output{
+		KubeConfig: to.StrPtr(m["kubeconfig"].(string)),
+	}
 }
