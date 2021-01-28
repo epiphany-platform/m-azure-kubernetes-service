@@ -31,7 +31,7 @@ This command should always be preceded by 'plan' command.`,
 
 		err := viper.BindPFlags(cmd.Flags())
 		if err != nil {
-			logger.Fatal().Err(err)
+			logger.Fatal().Err(err).Msg("BindPFlags failed")
 		}
 
 		clientId = viper.GetString("client_id")
@@ -46,19 +46,19 @@ This command should always be preceded by 'plan' command.`,
 		stateFilePath := filepath.Join(SharedDirectory, stateFileName)
 		config, state, err := checkAndLoad(stateFilePath, configFilePath)
 		if err != nil {
-			logger.Fatal().Err(err)
+			logger.Fatal().Err(err).Msg("checkAndLoad failed")
 		}
 
 		// TODO implement "IsApplicable" in e-structures
 		if !reflect.DeepEqual(state.AzKS, &st.AzKSState{}) && state.AzKS.Status != st.Initialized && state.AzKS.Status != st.Destroyed {
-			logger.Fatal().Err(errors.New(string("unexpected state: " + state.AzKS.Status)))
+			logger.Fatal().Err(errors.New(string("unexpected state: " + state.AzKS.Status))).Msg("incorrect state")
 		}
 
 		// TODO check if there is terraform plan file present
 
 		err = showModulePlan(config, state)
 		if err != nil {
-			logger.Fatal().Err(err)
+			logger.Fatal().Err(err).Msg("showModulePlan failed")
 		}
 		output, err := terraformApply()
 		if err != nil {
@@ -71,12 +71,12 @@ This command should always be preceded by 'plan' command.`,
 		logger.Debug().Msg("backup state file")
 		err = backupFile(stateFilePath)
 		if err != nil {
-			logger.Fatal().Err(err)
+			logger.Fatal().Err(err).Msg("backupFile failed")
 		}
 
 		terraformOutputMap, err := getTerraformOutputMap()
 		if err != nil {
-			logger.Fatal().Err(err)
+			logger.Fatal().Err(err).Msg("getTerraformOutputMap failed")
 		}
 
 		state.AzKS.Output = produceOutput(terraformOutputMap)
@@ -84,19 +84,19 @@ This command should always be preceded by 'plan' command.`,
 		logger.Debug().Msg("save state")
 		err = saveState(stateFilePath, state)
 		if err != nil {
-			logger.Fatal().Err(err)
+			logger.Fatal().Err(err).Msg("saveState failed")
 		}
 
 		bytes, err := state.Marshal()
 		if err != nil {
-			logger.Fatal().Err(err)
+			logger.Fatal().Err(err).Msg("state.Marshal failed")
 		}
 		logger.Info().Msg(string(bytes))
 		fmt.Println("State after apply: \n" + string(bytes))
 
 		msg, err := count(output)
 		if err != nil {
-			logger.Fatal().Err(err)
+			logger.Fatal().Err(err).Msg("count failed")
 		}
 		logger.Info().Msg("Performed following changes: " + msg)
 		fmt.Println("Performed following changes: \n\t" + msg)

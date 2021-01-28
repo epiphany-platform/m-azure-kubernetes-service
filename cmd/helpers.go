@@ -18,6 +18,7 @@ func ensureDirectory(path string) error {
 }
 
 func loadState(path string) (*st.State, error) {
+	logger.Debug().Msgf("loadState(%s)", path)
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		return st.NewState(), nil
 	} else {
@@ -50,6 +51,7 @@ func saveState(path string, state *st.State) error {
 }
 
 func loadConfig(path string) (*azks.Config, error) {
+	logger.Debug().Msgf("loadConfig(%s)", path)
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		return azks.NewConfig(), nil
 	} else {
@@ -79,6 +81,7 @@ func saveConfig(path string, config *azks.Config) error {
 }
 
 func backupFile(path string) error {
+	logger.Debug().Msgf("backupFile(%s)", path)
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		return nil
 	} else {
@@ -98,6 +101,7 @@ func backupFile(path string) error {
 }
 
 func checkAndLoad(stateFilePath string, configFilePath string) (*azks.Config, *st.State, error) {
+	logger.Debug().Msgf("checkAndLoad(%s, %s)", stateFilePath, configFilePath)
 	if _, err := os.Stat(stateFilePath); os.IsNotExist(err) {
 		return nil, nil, errors.New("state file does not exist, please run init first")
 	}

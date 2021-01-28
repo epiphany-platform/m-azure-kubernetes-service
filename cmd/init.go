@@ -34,7 +34,7 @@ var initCmd = &cobra.Command{
 
 		err := viper.BindPFlags(cmd.Flags())
 		if err != nil {
-			logger.Fatal().Err(err)
+			logger.Fatal().Err(err).Msg("BindPFlags failed")
 		}
 
 		name = viper.GetString("name")
@@ -52,32 +52,32 @@ var initCmd = &cobra.Command{
 		logger.Debug().Msg("ensure directories")
 		err := ensureDirectory(moduleDirectoryPath)
 		if err != nil {
-			logger.Fatal().Err(err)
+			logger.Fatal().Err(err).Msg("ensureDirectory failed")
 		}
 		logger.Debug().Msg("load state file")
 		state, err := loadState(stateFilePath)
 		if err != nil {
-			logger.Fatal().Err(err)
+			logger.Fatal().Err(err).Msg("loadState failed")
 		}
 		logger.Debug().Msg("load config file")
 		config, err := loadConfig(configFilePath)
 		if err != nil {
-			logger.Fatal().Err(err)
+			logger.Fatal().Err(err).Msg("loadConfig failed")
 		}
 
 		if !reflect.DeepEqual(state.AzKS, &st.AzKSState{}) && state.AzKS.Status != st.Initialized && state.AzKS.Status != st.Destroyed {
-			logger.Fatal().Err(errors.New(string("unexpected state: " + state.AzKS.Status)))
+			logger.Fatal().Err(errors.New(string("unexpected state: " + state.AzKS.Status))).Msg("incorrect state")
 		}
 
 		logger.Debug().Msg("backup state file")
 		err = backupFile(stateFilePath)
 		if err != nil {
-			logger.Fatal().Err(err)
+			logger.Fatal().Err(err).Msg("backupFile failed")
 		}
 		logger.Debug().Msg("backup config file")
 		err = backupFile(configFilePath)
 		if err != nil {
-			logger.Fatal().Err(err)
+			logger.Fatal().Err(err).Msg("backupFile failed")
 		}
 
 		config.GetParams().Name = to.StrPtr(name)
@@ -124,17 +124,17 @@ var initCmd = &cobra.Command{
 		logger.Debug().Msg("save config")
 		err = saveConfig(configFilePath, config)
 		if err != nil {
-			logger.Fatal().Err(err)
+			logger.Fatal().Err(err).Msg("saveConfig failed")
 		}
 		logger.Debug().Msg("save state")
 		err = saveState(stateFilePath, state)
 		if err != nil {
-			logger.Fatal().Err(err)
+			logger.Fatal().Err(err).Msg("saveState failed")
 		}
 
 		bytes, err := config.Marshal()
 		if err != nil {
-			logger.Fatal().Err(err)
+			logger.Fatal().Err(err).Msg("config.Marshal failed")
 		}
 		logger.Info().Msg(string(bytes))
 		fmt.Println("Initialized config: \n" + string(bytes))
