@@ -11,6 +11,7 @@ import (
 	"encoding/pem"
 	"fmt"
 	"github.com/Azure/azure-sdk-for-go/profiles/2020-09-01/network/mgmt/network"
+	azks "github.com/epiphany-platform/e-structures/azks/v0"
 	"github.com/epiphany-platform/e-structures/utils/to"
 	"io"
 	"io/ioutil"
@@ -871,7 +872,7 @@ func TestInit(t *testing.T) {
 	}
 }
 
-// In TestPlan it's extremely important to keep location, rg, vnet and subnet names stable, as they are created once and removed once to optimise test time
+// In TestPlan it's extremely important to keep location, rg, vnet and subnet names stable, as they are created once and removed once to optimise test time.
 func TestPlan(t *testing.T) {
 	tests := []struct {
 		name                   string
@@ -880,8 +881,7 @@ func TestPlan(t *testing.T) {
 		wantPlanOutputLastLine string
 	}{
 		{
-			name:       "initialized without any prior steps",
-			planParams: nil,
+			name: "initialized without any prior steps",
 			existingConfigContent: []byte(`{
   "kind": "azks",
   "version": "v0.0.1",
@@ -921,11 +921,17 @@ func TestPlan(t *testing.T) {
     "admin_username": "operations"
   }
 }`),
+			planParams:             map[string]string{"--debug": "true"},
 			wantPlanOutputLastLine: "\tAdd: 1, Change: 0, Destroy: 0",
 		},
 	}
 
-	fakeInitParams := map[string]string{"--name": "azks-integration-test"}
+	config := &azks.Config{}
+	err := json.Unmarshal(tests[0].existingConfigContent, config)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fakeInitParams := map[string]string{"--name": *config.Params.Name}
 	name, remoteSharedPath, localSharedPath, environments, _ := setup(t, fakeInitParams)
 	defer cleanup(t, localSharedPath, environments["SUBSCRIPTION_ID"], name)
 
@@ -959,10 +965,124 @@ func TestPlan(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			preparePreRequisites(t, environments["SUBSCRIPTION_ID"])
+			preparePreRequisites(t, environments["SUBSCRIPTION_ID"], config)
 
 			gotPlanOutputLastLine := getLastLineFromMultilineSting(t, dockerRun(t, "plan", tt.planParams, environments, remoteSharedPath))
 			if diff := deep.Equal(gotPlanOutputLastLine, tt.wantPlanOutputLastLine); diff != nil {
+				t.Error(diff)
+			}
+		})
+	}
+}
+
+// CAUTION: every entry in tests table will make this test longer for about 12 - 15 minutes!
+func TestApply(t *testing.T) {
+	tests := []struct {
+		name                    string
+		existingConfigContent   []byte
+		planParams              map[string]string
+		wantPlanOutputLastLine  string
+		applyParams             map[string]string
+		wantApplyOutputLastLine string
+	}{
+		{
+			name: "initialized without any prior steps",
+			existingConfigContent: []byte(`{
+  "kind": "azks",
+  "version": "v0.0.1",
+  "params": {
+    "name": "azks-integration-test",
+    "location": "northeurope",
+    "rsa_pub_path": "/shared/vms_rsa.pub",
+    "rg_name": "azks-integration-test-rg",
+    "vnet_name": "azks-integration-test-vnet",
+    "subnet_name": "azks",
+    "kubernetes_version": "1.18.14",
+    "enable_node_public_ip": false,
+    "enable_rbac": false,
+    "default_node_pool": {
+      "size": 2,
+      "min": 2,
+      "max": 5,
+      "vm_size": "Standard_DS2_v2",
+      "disk_size": "36",
+      "auto_scaling": true,
+      "type": "VirtualMachineScaleSets"
+    },
+    "auto_scaler_profile": {
+      "balance_similar_node_groups": false,
+      "max_graceful_termination_sec": "600",
+      "scale_down_delay_after_add": "10m",
+      "scale_down_delay_after_delete": "10s",
+      "scale_down_delay_after_failure": "10m",
+      "scan_interval": "10s",
+      "scale_down_unneeded": "10m",
+      "scale_down_unready": "10m",
+      "scale_down_utilization_threshold": "0.5"
+    },
+    "azure_ad": null,
+    "identity_type": "SystemAssigned",
+    "kube_dashboard_enabled": true,
+    "admin_username": "operations"
+  }
+}`),
+			planParams:              map[string]string{"--debug": "true"},
+			wantPlanOutputLastLine:  "\tAdd: 1, Change: 0, Destroy: 0",
+			applyParams:             map[string]string{"--debug": "true"},
+			wantApplyOutputLastLine: "\tAdd: 1, Change: 0, Destroy: 0",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			config := &azks.Config{}
+			err := json.Unmarshal(tt.existingConfigContent, config)
+			if err != nil {
+				t.Fatal(err)
+			}
+			fakeInitParams := map[string]string{"--name": *config.Params.Name}
+			name, remoteSharedPath, localSharedPath, environments, _ := setup(t, fakeInitParams)
+			defer cleanup(t, localSharedPath, environments["SUBSCRIPTION_ID"], name)
+
+			if tt.existingConfigContent != nil {
+				err := os.MkdirAll(path.Join(localSharedPath, "azks"), os.ModePerm)
+				if err != nil {
+					t.Fatal(err)
+				}
+				err = ioutil.WriteFile(path.Join(localSharedPath, "azks/azks-config.json"), tt.existingConfigContent, 0600)
+				if err != nil {
+					t.Fatal(err)
+				}
+			}
+			err = ioutil.WriteFile(path.Join(localSharedPath, "state.json"), []byte(`{
+	"kind": "state",
+	"version": "v0.0.3",
+	"azbi": {
+		"status": "",
+		"config": null,
+		"output": null
+	},
+	"azks": {
+		"status": "initialized",
+		"config": null,
+		"output": null
+	}
+}`), 0600)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			preparePreRequisites(t, environments["SUBSCRIPTION_ID"], config)
+
+			gotPlanOutputLastLine := getLastLineFromMultilineSting(t, dockerRun(t, "plan", tt.planParams, environments, remoteSharedPath))
+			if diff := deep.Equal(gotPlanOutputLastLine, tt.wantPlanOutputLastLine); diff != nil {
+				t.Error(diff)
+			}
+
+			gotApplyOutputLastLine := getLastLineFromMultilineSting(t, dockerRun(t, "apply", tt.applyParams, environments, remoteSharedPath))
+
+			if diff := deep.Equal(gotApplyOutputLastLine, tt.wantApplyOutputLastLine); diff != nil {
 				t.Error(diff)
 			}
 		})
@@ -1050,7 +1170,7 @@ func setup(t *testing.T, initParams map[string]string) (string, string, string, 
 	return name, remoteSharedPath, localSharedPath, environments, privateKey
 }
 
-func preparePreRequisites(t *testing.T, subscriptionId string) {
+func preparePreRequisites(t *testing.T, subscriptionId string, config *azks.Config) {
 	t.Log("preparePreRequisites()")
 	groupsClient := resources.NewGroupsClient(subscriptionId)
 	vnetClient := network.NewVirtualNetworksClient(subscriptionId)
@@ -1066,12 +1186,15 @@ func preparePreRequisites(t *testing.T, subscriptionId string) {
 	ctx := context.TODO()
 	dts := time.Now().Format("2006-01-02 15:04:05")
 
-	g, err := groupsClient.CreateOrUpdate(ctx, "azks-integration-test-rg",
+	g, err := groupsClient.CreateOrUpdate(ctx, *config.Params.RgName,
 		resources.Group{
-			Location: to.StrPtr("northeurope"),
+			Location: config.Params.Location,
 			Tags: map[string]*string{
+				"product":    to.StrPtr("epiphany"),
+				"module":     to.StrPtr("azks"),
 				"purpose":    to.StrPtr("integration-tests"),
 				"created_at": to.StrPtr(dts),
+				"creator":    to.StrPtr("automation"),
 			},
 		},
 	)
@@ -1079,7 +1202,7 @@ func preparePreRequisites(t *testing.T, subscriptionId string) {
 		t.Fatal(err)
 	}
 
-	_, err = vnetClient.CreateOrUpdate(ctx, *g.Name, "azks-integration-test-vnet",
+	_, err = vnetClient.CreateOrUpdate(ctx, *g.Name, *config.Params.VnetName,
 		network.VirtualNetwork{
 			Location: g.Location,
 			VirtualNetworkPropertiesFormat: &network.VirtualNetworkPropertiesFormat{
@@ -1088,7 +1211,7 @@ func preparePreRequisites(t *testing.T, subscriptionId string) {
 				},
 				Subnets: &[]network.Subnet{
 					{
-						Name: to.StrPtr("azks"),
+						Name: config.Params.SubnetName,
 						SubnetPropertiesFormat: &network.SubnetPropertiesFormat{
 							AddressPrefix: to.StrPtr("10.0.1.0/24"),
 						},
@@ -1096,8 +1219,11 @@ func preparePreRequisites(t *testing.T, subscriptionId string) {
 				},
 			},
 			Tags: map[string]*string{
+				"product":    to.StrPtr("epiphany"),
+				"module":     to.StrPtr("azks"),
 				"purpose":    to.StrPtr("integration-tests"),
 				"created_at": to.StrPtr(dts),
+				"creator":    to.StrPtr("automation"),
 			},
 		},
 	)
