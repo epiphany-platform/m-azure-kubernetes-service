@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"context"
 	"crypto/rand"
@@ -9,15 +10,18 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
+	"github.com/Azure/azure-sdk-for-go/profiles/2020-09-01/network/mgmt/network"
+	"github.com/epiphany-platform/e-structures/utils/to"
 	"io"
 	"io/ioutil"
 	"os"
 	"path"
 	"reflect"
+	"strings"
 	"testing"
 	"time"
 
-	"github.com/Azure/azure-sdk-for-go/profiles/2019-03-01/resources/mgmt/resources"
+	"github.com/Azure/azure-sdk-for-go/profiles/2020-09-01/resources/mgmt/resources"
 	"github.com/Azure/go-autorest/autorest/azure/auth"
 	"github.com/epiphany-platform/m-azure-kubernetes-service/cmd"
 	"github.com/go-test/deep"
@@ -867,6 +871,104 @@ func TestInit(t *testing.T) {
 	}
 }
 
+// In TestPlan it's extremely important to keep location, rg, vnet and subnet names stable, as they are created once and removed once to optimise test time
+func TestPlan(t *testing.T) {
+	tests := []struct {
+		name                   string
+		existingConfigContent  []byte
+		planParams             map[string]string
+		wantPlanOutputLastLine string
+	}{
+		{
+			name:       "initialized without any prior steps",
+			planParams: nil,
+			existingConfigContent: []byte(`{
+  "kind": "azks",
+  "version": "v0.0.1",
+  "params": {
+    "name": "azks-integration-test",
+    "location": "northeurope",
+    "rsa_pub_path": "/shared/vms_rsa.pub",
+    "rg_name": "azks-integration-test-rg",
+    "vnet_name": "azks-integration-test-vnet",
+    "subnet_name": "azks",
+    "kubernetes_version": "1.18.14",
+    "enable_node_public_ip": false,
+    "enable_rbac": false,
+    "default_node_pool": {
+      "size": 2,
+      "min": 2,
+      "max": 5,
+      "vm_size": "Standard_DS2_v2",
+      "disk_size": "36",
+      "auto_scaling": true,
+      "type": "VirtualMachineScaleSets"
+    },
+    "auto_scaler_profile": {
+      "balance_similar_node_groups": false,
+      "max_graceful_termination_sec": "600",
+      "scale_down_delay_after_add": "10m",
+      "scale_down_delay_after_delete": "10s",
+      "scale_down_delay_after_failure": "10m",
+      "scan_interval": "10s",
+      "scale_down_unneeded": "10m",
+      "scale_down_unready": "10m",
+      "scale_down_utilization_threshold": "0.5"
+    },
+    "azure_ad": null,
+    "identity_type": "SystemAssigned",
+    "kube_dashboard_enabled": true,
+    "admin_username": "operations"
+  }
+}`),
+			wantPlanOutputLastLine: "\tAdd: 1, Change: 0, Destroy: 0",
+		},
+	}
+
+	fakeInitParams := map[string]string{"--name": "azks-integration-test"}
+	name, remoteSharedPath, localSharedPath, environments, _ := setup(t, fakeInitParams)
+	defer cleanup(t, localSharedPath, environments["SUBSCRIPTION_ID"], name)
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.existingConfigContent != nil {
+				err := os.MkdirAll(path.Join(localSharedPath, "azks"), os.ModePerm)
+				if err != nil {
+					t.Fatal(err)
+				}
+				err = ioutil.WriteFile(path.Join(localSharedPath, "azks/azks-config.json"), tt.existingConfigContent, 0600)
+				if err != nil {
+					t.Fatal(err)
+				}
+			}
+			err := ioutil.WriteFile(path.Join(localSharedPath, "state.json"), []byte(`{
+	"kind": "state",
+	"version": "v0.0.3",
+	"azbi": {
+		"status": "",
+		"config": null,
+		"output": null
+	},
+	"azks": {
+		"status": "initialized",
+		"config": null,
+		"output": null
+	}
+}`), 0600)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			preparePreRequisites(t, environments["SUBSCRIPTION_ID"])
+
+			gotPlanOutputLastLine := getLastLineFromMultilineSting(t, dockerRun(t, "plan", tt.planParams, environments, remoteSharedPath))
+			if diff := deep.Equal(gotPlanOutputLastLine, tt.wantPlanOutputLastLine); diff != nil {
+				t.Error(diff)
+			}
+		})
+	}
+}
+
 // dockerRun function wraps docker run operation and returns `docker run` output.
 func dockerRun(t *testing.T, command string, parameters map[string]string, environments map[string]string, sharedPath string) string {
 	commandWithParameters := []string{command}
@@ -948,10 +1050,66 @@ func setup(t *testing.T, initParams map[string]string) (string, string, string, 
 	return name, remoteSharedPath, localSharedPath, environments, privateKey
 }
 
+func preparePreRequisites(t *testing.T, subscriptionId string) {
+	t.Log("preparePreRequisites()")
+	groupsClient := resources.NewGroupsClient(subscriptionId)
+	vnetClient := network.NewVirtualNetworksClient(subscriptionId)
+
+	authorizer, err := auth.NewAuthorizerFromEnvironment()
+	if err != nil {
+		t.Error(err)
+	}
+
+	groupsClient.Authorizer = authorizer
+	vnetClient.Authorizer = authorizer
+
+	ctx := context.TODO()
+	dts := time.Now().Format("2006-01-02 15:04:05")
+
+	g, err := groupsClient.CreateOrUpdate(ctx, "azks-integration-test-rg",
+		resources.Group{
+			Location: to.StrPtr("northeurope"),
+			Tags: map[string]*string{
+				"purpose":    to.StrPtr("integration-tests"),
+				"created_at": to.StrPtr(dts),
+			},
+		},
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, err = vnetClient.CreateOrUpdate(ctx, *g.Name, "azks-integration-test-vnet",
+		network.VirtualNetwork{
+			Location: g.Location,
+			VirtualNetworkPropertiesFormat: &network.VirtualNetworkPropertiesFormat{
+				AddressSpace: &network.AddressSpace{
+					AddressPrefixes: &[]string{"10.0.0.0/16"},
+				},
+				Subnets: &[]network.Subnet{
+					{
+						Name: to.StrPtr("azks"),
+						SubnetPropertiesFormat: &network.SubnetPropertiesFormat{
+							AddressPrefix: to.StrPtr("10.0.1.0/24"),
+						},
+					},
+				},
+			},
+			Tags: map[string]*string{
+				"purpose":    to.StrPtr("integration-tests"),
+				"created_at": to.StrPtr(dts),
+			},
+		},
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
 // cleanup function removes directories created during test and ensures that resource
 // group gets removed if it was created.
 func cleanup(t *testing.T, sharedPath string, subscriptionId string, name string) {
-	t.Logf("cleanup()")
+	t.Log("cleanup()")
 	_ = os.RemoveAll(sharedPath)
 	if isResourceGroupPresent(t, subscriptionId, name) {
 		removeResourceGroup(t, subscriptionId, name)
@@ -960,7 +1118,7 @@ func cleanup(t *testing.T, sharedPath string, subscriptionId string, name string
 
 // isResourceGroupPresent function checks if resource group with given name exists.
 func isResourceGroupPresent(t *testing.T, subscriptionId string, name string) bool {
-	t.Logf("isResourceGroupPresent()")
+	t.Log("isResourceGroupPresent()")
 	groupsClient := resources.NewGroupsClient(subscriptionId)
 	authorizer, err := auth.NewAuthorizerFromEnvironment()
 	if err != nil {
@@ -979,7 +1137,7 @@ func isResourceGroupPresent(t *testing.T, subscriptionId string, name string) bo
 // removeResourceGroup function invokes Delete operation on provided resource
 // group name and waits for operation completion.
 func removeResourceGroup(t *testing.T, subscriptionId string, name string) {
-	t.Logf("Will prepare new az groups client")
+	t.Log("Will prepare new az groups client")
 	ctx := context.TODO()
 	groupsClient := resources.NewGroupsClient(subscriptionId)
 	authorizer, err := auth.NewAuthorizerFromEnvironment()
@@ -988,12 +1146,11 @@ func removeResourceGroup(t *testing.T, subscriptionId string, name string) {
 	}
 	groupsClient.Authorizer = authorizer
 	rgName := fmt.Sprintf("%s-rg", name)
-	t.Logf("Will perform delete RG operation")
+	t.Log("Will perform delete RG operation")
 	gdf, err := groupsClient.Delete(ctx, rgName)
 	if err != nil {
 		t.Fatal(err)
 	}
-
 	done := make(chan struct{})
 	now := time.Now()
 
@@ -1001,10 +1158,9 @@ func removeResourceGroup(t *testing.T, subscriptionId string, name string) {
 
 	go func() {
 		defer close(done)
-		t.Logf("Will start waiting for RG deletion finish.")
-		resp, err := gdf.Result(groupsClient)
-		t.Logf("Deletion response: %v\n", resp)
-		t.Logf("Finished RG deletion.")
+		t.Log("Will start waiting for RG deletion finish.")
+		err = gdf.WaitForCompletionRef(ctx, groupsClient.BaseClient.Client)
+		t.Log("Finished RG deletion.")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -1051,6 +1207,22 @@ func generateRsaKeyPair(t *testing.T, directory string, name string) ssh.Signer 
 		t.Fatal(err)
 	}
 	return signer
+}
+
+// getLastLineFromMultilineSting is helper function to extract just last line
+// from multiline string.
+func getLastLineFromMultilineSting(t *testing.T, s string) string {
+	in := strings.NewReader(s)
+	reader := bufio.NewReader(in)
+	for {
+		line, err := reader.ReadBytes('\n')
+		if err != nil && err != io.EOF {
+			t.Fatal(err)
+		}
+		if err == io.EOF {
+			return string(line)
+		}
+	}
 }
 
 // loadEnvironmentVariables obtains 6 variables from environment.
