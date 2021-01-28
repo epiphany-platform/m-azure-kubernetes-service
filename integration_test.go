@@ -975,7 +975,7 @@ func TestPlan(t *testing.T) {
 	}
 }
 
-// CAUTION: every entry in tests table will make this test longer for about 12 - 15 minutes!
+// CAUTION: every entry in tests table will make this test longer for about 12 - 13 minutes!
 func TestApply(t *testing.T) {
 	tests := []struct {
 		name                    string
