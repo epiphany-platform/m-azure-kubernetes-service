@@ -96,8 +96,7 @@ func showModulePlan(config *azks.Config, state *st.State) error {
 	return nil
 }
 
-//TODO unify return with apply function
-func terraformPlan() string {
+func terraformPlan() (string, error) {
 	logger.Debug().Msg("terraformPlan")
 
 	options, err := terra.WithDefaultRetryableErrors(&terra.Options{
@@ -116,17 +115,16 @@ func terraformPlan() string {
 		Logger:        ZeroLogger{},
 	})
 	if err != nil {
-		logger.Fatal().Err(err).Msg("terraform options preparation failed")
+		return "", err
 	}
 	output, err := terra.Plan(options)
 	if err != nil {
-		logger.Fatal().Err(err).Msg("terraform plan command failed")
+		return "", err
 	}
-	return output
+	return output, nil
 }
 
-//TODO unify return with apply function
-func terraformPlanDestroy() string {
+func terraformPlanDestroy() (string, error) {
 	logger.Debug().Msg("terraformPlanDestroy")
 
 	options, err := terra.WithDefaultRetryableErrors(&terra.Options{
@@ -145,13 +143,13 @@ func terraformPlanDestroy() string {
 		Logger:        ZeroLogger{},
 	})
 	if err != nil {
-		logger.Fatal().Err(err).Msg("terraform options preparation failed")
+		return "", err
 	}
 	output, err := terra.PlanDestroy(options)
 	if err != nil {
-		logger.Fatal().Err(err).Msg("terraform plan destroy command failed")
+		return "", err
 	}
-	return output
+	return output, nil
 }
 
 func terraformApply() (string, error) {

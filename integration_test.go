@@ -10,9 +10,6 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
-	"github.com/Azure/azure-sdk-for-go/profiles/2020-09-01/network/mgmt/network"
-	azks "github.com/epiphany-platform/e-structures/azks/v0"
-	"github.com/epiphany-platform/e-structures/utils/to"
 	"io"
 	"io/ioutil"
 	"os"
@@ -21,6 +18,10 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/Azure/azure-sdk-for-go/profiles/2020-09-01/network/mgmt/network"
+	azks "github.com/epiphany-platform/e-structures/azks/v0"
+	"github.com/epiphany-platform/e-structures/utils/to"
 
 	"github.com/Azure/azure-sdk-for-go/profiles/2020-09-01/resources/mgmt/resources"
 	"github.com/Azure/go-autorest/autorest/azure/auth"
@@ -965,7 +966,7 @@ func TestPlan(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			preparePreRequisites(t, environments["SUBSCRIPTION_ID"], config)
+			prepareAzurePreRequisites(t, environments["SUBSCRIPTION_ID"], config)
 
 			gotPlanOutputLastLine := getLastLineFromMultilineSting(t, dockerRun(t, "plan", tt.planParams, environments, remoteSharedPath))
 			if diff := deep.Equal(gotPlanOutputLastLine, tt.wantPlanOutputLastLine); diff != nil {
@@ -1073,7 +1074,7 @@ func TestApply(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			preparePreRequisites(t, environments["SUBSCRIPTION_ID"], config)
+			prepareAzurePreRequisites(t, environments["SUBSCRIPTION_ID"], config)
 
 			gotPlanOutputLastLine := getLastLineFromMultilineSting(t, dockerRun(t, "plan", tt.planParams, environments, remoteSharedPath))
 			if diff := deep.Equal(gotPlanOutputLastLine, tt.wantPlanOutputLastLine); diff != nil {
@@ -1170,8 +1171,9 @@ func setup(t *testing.T, initParams map[string]string) (string, string, string, 
 	return name, remoteSharedPath, localSharedPath, environments, privateKey
 }
 
-func preparePreRequisites(t *testing.T, subscriptionId string, config *azks.Config) {
-	t.Log("preparePreRequisites()")
+// prepareAzurePreRequisites creates RG, VNET and Subnet for plan and apply tests.
+func prepareAzurePreRequisites(t *testing.T, subscriptionId string, config *azks.Config) {
+	t.Log("prepareAzurePreRequisites()")
 	groupsClient := resources.NewGroupsClient(subscriptionId)
 	vnetClient := network.NewVirtualNetworksClient(subscriptionId)
 
@@ -1379,6 +1381,7 @@ func loadEnvironmentVariables(t *testing.T) map[string]string {
 	return result
 }
 
+// jsonEqual decodes two JSONs into interface{}s and then compares them
 func jsonEqual(t *testing.T, got, want io.Reader) (bool, error) {
 	var dGot, dWant interface{}
 	d := json.NewDecoder(got)
@@ -1393,6 +1396,7 @@ func jsonEqual(t *testing.T, got, want io.Reader) (bool, error) {
 	return reflect.DeepEqual(dGot, dWant), nil
 }
 
+// mustReMarshalJson Unmashals and then Marshals JSON to make sure that it is ordered in predictable way
 func mustReMarshalJson(t *testing.T, b []byte) io.Reader {
 	var j interface{}
 	err := json.Unmarshal(b, &j)

@@ -1,66 +1,55 @@
-//OK
 variable "name" {
   description = "Prefix for resource names"
   type        = string
 }
 
-//OK
 variable "rg_name" {
   description = "Name of an resource group to deploy AKS cluster in"
   type        = string
 }
 
-//OK
 variable "vnet_name" {
   description = "Main Virtual Network's name"
   type        = string
 }
 
-//OK
 variable "subnet_name" {
 	description = "Name of the existing subnet to deploy AKS cluster in"
 	type        = string
 }
 
-//OK
 variable "rsa_pub_path" {
   description = "Public ssh key path"
   type        = string
 }
 
-//OK
 variable "kubernetes_version" {
   description = "Kubernetes version"
   type        = string
 }
 
-//OK
 variable "enable_node_public_ip" {
   description = "Whether to enable public IPs or not"
   type        = bool
 }
 
-//NOPE I believe we should not configure it
 variable "network_plugin" {
   description = "AKS network plugin"
   type        = string
   default     = "azure"
 }
 
-//NOPE I believe we should not configure it
 variable "network_policy" {
   description = "AKS network policy"
   type        = string
   default     = "calico"
 }
 
-//OK
 variable "enable_rbac" {
   description = "Whether RBAC is enabled or not"
   type        = bool
 }
 
-//OK
 variable "default_node_pool" {
   description = "Default node pool for AKS"
   type = object({
@@ -74,7 +63,6 @@ variable "default_node_pool" {
   })
 }
 
-//OK
 variable "auto_scaler_profile" {
   description = "Auto scaler profile"
   type = object({
@@ -90,7 +78,6 @@ variable "auto_scaler_profile" {
   })
 }
 
-//OK
 variable "azure_ad" {
   description = "Azure Active Directory settings"
   type = object({
@@ -100,20 +87,17 @@ variable "azure_ad" {
   })
 }
 
-//OK
 variable "identity_type" {
   description = "The type of identity used for the managed cluster"
   type        = string
   default     = "SystemAssigned"
 }
 
-//OK
 variable "kube_dashboard_enabled" {
   description = "Whether k8s dashboard is enabled or not"
   type        = bool
 }
 
-//OK
 variable "admin_username" {
   description = "Admin user on Linux OS"
   type        = string
