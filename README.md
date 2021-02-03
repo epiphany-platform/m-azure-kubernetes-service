@@ -89,6 +89,10 @@ For examples running description please have a look into [this document](docs/EX
 
 For development related topics please look into [this document](docs/DEVELOPMENT.md).
 
+# Azure limits
+
+There are subscription or regional limits in Azure Cloud. All of them can be investigated [on this site](https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/azure-subscription-service-limits). For this module most important limitation is kubernetes version operating in a region of your choice. To check version `az aks get-versions --location <your region>`. To check your current resources usage please go to Azure Portal > Subscriptions > select subscription > Usage + quotas. 
+
 # Module dependencies
 
 | Component                 | Version | Repo/Website                                          | License                                                           |
