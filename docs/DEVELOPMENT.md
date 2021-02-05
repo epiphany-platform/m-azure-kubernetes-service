@@ -121,7 +121,7 @@ There is a simple way to develop terraform scripts independently of module.
    ```
    ...
    DBG go/src/github.com/epiphany-platform/m-azure-kubernetes-service/cmd/common.go:61 > templateTfVars
-   INF go/src/github.com/epiphany-platform/m-azure-kubernetes-service/cmd/common.go:68 > {" TODO fix "}
+   INF go/src/github.com/epiphany-platform/m-azure-kubernetes-service/cmd/common.go:68 > {"name":"epiphany","location":"northeurope", ...}
    ...
    ```
 1) you should copy provided JSON to file `./terraform/terraform.tfvars.json` relatively to `resources` directory

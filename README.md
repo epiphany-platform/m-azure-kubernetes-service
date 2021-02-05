@@ -1,6 +1,6 @@
 # m-azure-kubernetes-service
 
-Epiphany Module: Azure Basic Infrastructure
+Epiphany Module: Azure Kubernetes Service
 
 AzKS module is responsible for providing AKS cluster. 
 
