@@ -5,7 +5,7 @@
 Prepare your own variables in `azure.mk` file to use in the process.
 Sample file (`examples/basic_flow/azure.mk.sample`):
 
-```shell
+```make
 ARM_CLIENT_ID ?= client-id-value
 ARM_CLIENT_SECRET ?= client-secret-field
 ARM_SUBSCRIPTION_ID ?= subscription-id-field

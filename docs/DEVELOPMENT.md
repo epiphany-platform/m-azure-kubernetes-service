@@ -120,8 +120,8 @@ There is a simple way to develop terraform scripts independently of module.
 1) that would provide you detailed output and one of first lines provides used .tfvars.json file. It will look similar to following: 
    ```
    ...
-   2021-01-15T13:42:27Z DBG go/src/github.com/epiphany-platform/m-azure-kubernetes-service/cmd/common.go:61 > templateTfVars
-   2021-01-15T13:42:27Z INF go/src/github.com/epiphany-platform/m-azure-kubernetes-service/cmd/common.go:68 > {" TODO fix "}
+   DBG go/src/github.com/epiphany-platform/m-azure-kubernetes-service/cmd/common.go:61 > templateTfVars
+   INF go/src/github.com/epiphany-platform/m-azure-kubernetes-service/cmd/common.go:68 > {" TODO fix "}
    ...
    ```
 1) you should copy provided JSON to file `./terraform/terraform.tfvars.json` relatively to `resources` directory
@@ -134,4 +134,4 @@ To be able to run version of terraform that scripts require you can use followin
 ```
 docker run --rm -it -e ARM_SUBSCRIPTION_ID=xxx -e ARM_CLIENT_ID=yyy -e ARM_CLIENT_SECRET=zzz -e ARM_TENANT_ID=vvv -v $(pwd)/terraform:/workspace -v $(pwd)/shared:/shared -w /workspace hashicorp/terraform:0.13.2 apply
 ```
-(notice `ARM_` prefix on passed envs)
+(notice `ARM_` prefix on passed environments)

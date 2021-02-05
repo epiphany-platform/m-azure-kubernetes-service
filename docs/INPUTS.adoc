@@ -51,7 +51,7 @@ Variable values can be passed as docker environment variables as well. We could 
 
 `init` command provides some parameters to configure the module from command line, but primary way to configure the module is its configuration file located in `shared/azbi/azbi-config.json`.
 
-Its important to know, that without `omit_state` parameter, `init` command will try to figure out following values using existing state file: `name`, `vsm_rsa`, `location`, `rg_name`, `vnet_name` and `subnet_name`. For `subnet_name` it will try to search for empty subnet named "azks", "kubernetes" or "aks".
+It's important to know, that without `omit_state` parameter, `init` command will try to figure out following values using existing state file: `name`, `vsm_rsa`, `location`, `rg_name`, `vnet_name` and `subnet_name`. For `subnet_name` it will try to search for empty subnet named "azks", "kubernetes" or "aks".
 
 Only fields that should not be modified are "kind" and "version" fields. All other fields can be modified before running `plan` command. Following listing provides example of configuration file generated with `--omit_state` parameter.
 
