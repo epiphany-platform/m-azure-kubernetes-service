@@ -13,11 +13,6 @@ variable "vnet_name" {
   type        = string
 }
 
-variable "address_prefix" {
-  description = "SubNetwork address space for AKS"
-  type        = string
-}
-
 variable "subnet_name" {
 	description = "Name of the existing subnet to deploy AKS cluster in"
 	type        = string

@@ -1,87 +1,108 @@
-== Input parameters
+= Input parameters
 
-[width="100%",cols="7%,1%,100%a,1%,50%a",options="header",]
+== Environment variables
+
+Following table presents parameters which should be passes as docker environment variables (`docker run -e KEY=val ...`).
+
+[width="100%",cols="7%,1%,25%a,1%,20%,50%a",options="header",]
 |===
-|Name |Type |Default value |Required |Description
-|M_ARM_CLIENT_ID |string |unset |yes |Azure client id
+|Name |Type |Default value |Required |Steps |Description
+|CLIENT_ID |string |unset |yes |plan, apply, destroy |Azure service principal client id
 
-|M_ARM_CLIENT_SECRET |string |unset |yes |Azure client secret
+|CLIENT_SECRET |string |unset |yes |plan, apply, destroy |Azure service principal client secret
 
-|M_ARM_SUBSCRIPTION_ID |string |unset |yes |Azure subscription
+|SUBSCRIPTION_ID |string |unset |yes |plan, apply, destroy |Azure subscription id
 
-|M_ARM_TENANT_ID |string |unset |yes |Azure tenant id
+|TENANT_ID |string |unset |yes |plan, apply, destroy |Azure subscription tenant id
 
-|M_NAME |string |epiphany |no |Prefix for resource names
-
-|M_RG_NAME |string |$(M_NAME)-rg |no |Resource group name to deploy AKS
-cluster in
-
-|M_VNET_NAME |string |$(M_NAME)-vnet |no |The name of virtual Network’s
-name
-
-|M_ADDRESS_PREFIX |string |10.0.0.0/16 |no |Subnetwork address space for
-AKS in CIDR notation
-
-|M_SUBNET_NAME |string |unset |no |Name of the existing subnet to deploy
-AKS cluster in
-
-|M_VMS_RSA |string |vms_rsa |no |SSH key name, should be located in
-shared directory
-
-|M_K8S_VERSION |string |1.18.8 |no |Kubernetes cluster version
-
-|M_PUBLIC_IP_ENABLED |bool |false |no |Whether to enable public IPs or
-not
-
-|M_RBAC_ENABLED |bool |false |no |Whether RBAC is enabled or not
-
-|M_DEFAULT_NODE_POOL |map
-|
-[source]
-----
-{
-  size: 2,
-  min: 2,
-  max: 5,
-  vm_size: Standard_DS2_v2,
-  disk_size: 36,
-  auto_scaling: true,
-  type: VirtualMachineScaleSets
-}
-----
-|no |Default node pool specification for AKS
-
-|M_AUTO_SCALER_PROFILE |map
-|
-[source]
-----
-{
-  balance_similar_node_groups: false,
-  max_graceful_termination_sec: 600,
-  scale_down_delay_after_add: 10m,
-  scale_down_delay_after_delete: 10s,
-  scale_down_delay_after_failure: 10m,
-  scan_interval: 10s,
-  scale_down_unneeded: 10m,
-  scale_down_unready: 10m,
-  scale_down_utilization_threshold: 0.5
-}
-----
-|no |Auto scaler profile
-specification
-
-|M_AZURE_AD |map |null |no
-|Azure Active Directory settings. Format:
-[source]
-----
-{
-  managed: bool,
-  tenant_id: string,
-  admin_group_object_ids: list(string)
-}
-----
-|M_K8S_DASHBOARD_ENABLED |bool |true |no |Whether Kubernetes dashboard
-is enabled or not
-
-|M_ADMIN_USERNAME |string |operations |no |Admin user on Linux OS
 |===
+
+Environment variables values can also be passed as command variables (`--key=value`), but it's often more convenient to pass sensitive values as presented.
+
+== Command variables
+
+Following table presents parameters which can be passed as command parameters (`docker run ... --key=value`).
+
+[width="100%",cols="7%,1%,25%a,1%,20%,50%a",options="header",]
+|===
+|Name |Type |Default value |Required |Steps |Description
+
+|name |string |epiphany |no |init |Name to be used on all resources as a prefix
+
+|rg_name |string |epiphany-rg |no |init |Name of Azure Resource Group to be used
+
+|subnet_name |string |azks |no |init |Name of subnet to be used
+
+|vnet_name |string |epiphany-vnet |no |init |Name of vnet to be used
+
+|kubernetes_version |string |1.18.14 |no |init |Version of Kubernetes to be used
+
+|vms_rsa |string |vms_rsa |no |init |SSH key name, should be located in shared directory
+
+|omit_state |bool |false |no |init |omit state values during initialization
+
+|debug |bool |false |no |all |prints additional debug information
+
+|===
+
+Variable values can be passed as docker environment variables as well. We could use `docker run` command `-e RG_NAME=some_name` parameter instead of `--rg_name=some_name` command parameter.
+
+== Configuration file
+
+`init` command provides some parameters to configure the module from command line, but primary way to configure the module is its configuration file located in `shared/azbi/azbi-config.json`.
+
+It's important to know, that without `omit_state` parameter, `init` command will try to figure out following values using existing state file: `name`, `vsm_rsa`, `location`, `rg_name`, `vnet_name` and `subnet_name`. For `subnet_name` it will try to search for empty subnet named "azks", "kubernetes" or "aks".
+
+Only fields that should not be modified are "kind" and "version" fields. All other fields can be modified before running `plan` command. Following listing provides example of configuration file generated with `--omit_state` parameter.
+
+----
+{
+	"kind": "azks",
+	"version": "v0.0.1",
+	"params": {
+		"name": "epiphany",
+		"location": "northeurope",
+		"rsa_pub_path": "/shared/vms_rsa.pub",
+		"rg_name": "epiphany-rg",
+		"vnet_name": "epiphany-vnet",
+		"subnet_name": "azks",
+		"kubernetes_version": "1.18.14",
+		"enable_node_public_ip": false,
+		"enable_rbac": false,
+		"default_node_pool": {
+			"size": 2,
+			"min": 2,
+			"max": 5,
+			"vm_size": "Standard_DS2_v2",
+			"disk_size": "36",
+			"auto_scaling": true,
+			"type": "VirtualMachineScaleSets"
+		},
+		"auto_scaler_profile": {
+			"balance_similar_node_groups": false,
+			"max_graceful_termination_sec": "600",
+			"scale_down_delay_after_add": "10m",
+			"scale_down_delay_after_delete": "10s",
+			"scale_down_delay_after_failure": "10m",
+			"scan_interval": "10s",
+			"scale_down_unneeded": "10m",
+			"scale_down_unready": "10m",
+			"scale_down_utilization_threshold": "0.5"
+		},
+		"azure_ad": null,
+		"identity_type": "SystemAssigned",
+		"kube_dashboard_enabled": true,
+		"admin_username": "operations"
+	}
+}
+----
+In presented example all parameters, except `azure_ad` are rather self-explanatory. `azure_ad` parameter is object of following structure:
+----
+"azure_ad": {
+	"managed": true,
+	"tenant_id": "123123123123",
+	"admin_group_object_ids": [
+        "123123123123"
+    ]
+}
+----

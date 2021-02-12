@@ -2,171 +2,100 @@
 
 Epiphany Module: Azure Kubernetes Service
 
-## Prepare service principal
+AzKS module is responsible for providing AKS cluster. 
 
-Have a look [here](https://www.terraform.io/docs/providers/azurerm/guides/service_principal_client_secret.html).
+# Basic usage
 
-```shell
-az login
-az account list #get subscription from id field
-az account set --subscription="SUBSCRIPTION_ID"
-az ad sp create-for-rbac --role="Contributor" --scopes="/subscriptions/SUBSCRIPTION_ID" --name="SOME_MEANINGFUL_NAME" #get appID, password, tenant, name and displayName
-```
+## Requirements
+
+Requirements are listed in a separate [document](docs/REQUIREMENTS.md).
 
 ## Run module
 
-The AzKS cluster and new subnet will be created in the resource group and vnet from the [AzBI Module](https://github.com/epiphany-platform/m-azure-basic-infrastructure) or you can create the AzKS cluster in an already existing subnet.
+* Create a shared directory:
 
-* Initialize the AzKS module in [AzBI Module](https://github.com/epiphany-platform/m-azure-basic-infrastructure) (without parameters it will extract some knowledge from the status file):
   ```shell
-  docker run --rm -v /tmp/shared:/shared -t epiphanyplatform/azks:latest init
+  mkdir /tmp/shared
   ```
-  or initialize the AzKS module with some parameters (ie.: in already existing subnet by setting `M_SUBNET_NAME`):
+
+  This 'shared' dir is a place where all configs and states will be stored while working with Epiphany modules.
+
+* Generate ssh keys in: /tmp/shared/vms_rsa.pub
+
   ```shell
-  docker run --rm -v /tmp/shared:/shared -t epiphanyplatform/azks:latest init M_RG_NAME="demo-ropu-rg" M_VNET_NAME="demo-ropu-vnet" M_SUBNET_NAME="demo-ropu-kubernetes-master-subnet-0"
+  ssh-keygen -t rsa -b 4096 -f /tmp/shared/vms_rsa -N ''
   ```
-  The previous command created a configuration file of the AzKS module in `/tmp/shared/azks/azks-config.yml`. You can investigate what is stored in that file and change it at will.
-* Plan and apply AzKS module:
+
+* [Optional] Build Docker image if development version is used
+
   ```shell
-  docker run --rm -v /tmp/shared:/shared -t epiphanyplatform/azks:latest plan M_ARM_CLIENT_ID=appId M_ARM_CLIENT_SECRET=password M_ARM_SUBSCRIPTION_ID=subscriptionId M_ARM_TENANT_ID=tenantId
-  docker run --rm -v /tmp/shared:/shared -t epiphanyplatform/azks:latest apply M_ARM_CLIENT_ID=appId M_ARM_CLIENT_SECRET=password M_ARM_SUBSCRIPTION_ID=subscriptionId M_ARM_TENANT_ID=tenantId
+  make build
   ```
-  Running those commands should create the AzKS service. You should verify in Azure Portal.
-* Extract kubeconfig following way:
+
+* Initialize AzKS module:
+
+  This module requires that existing resource group, vnet and subnet are already created (preferably with [AzBI](https://github.com/epiphany-platform/m-azure-basic-infrastructure) module). If those resources are already provided by AzBI module (and there is at least one empty subnet provided by AzBI module), initialization step can be started without any parameters and module will extract configuration from state file.  
+
   ```shell
-  docker run --rm -v /tmp/shared:/shared -t epiphanyplatform/azks:latest kubeconfig
+  docker run --rm -v /tmp/shared:/shared epiphanyplatform/azks:dev init
   ```
-  This command will create file `/tmp/shared/kubeconfig`. You will need to move this file manually to `/tmp/shared/build/your-cluster-name/kubeconfig`.
+  
+  If mentioned resources were created some other way (i.e.: manually) there is possibility to provide additional parameters: 
 
-## Build image
+  ```shell
+  docker run --rm -v /tmp/shared:/shared epiphanyplatform/azks:dev init --name=azks-modules-test  --subnet_name=some-subnet --vnet_name=some-vnet --rg_name=some-rg
+  ```
+  
+  For detailed list of init parameters go to [INPUTS](docs/INPUTS.adoc) documentation. 
 
-In main directory run:
+  :star: Variable values can be passed as docker environment variables as well. In presented example we could use `docker run` command `-e NAME=azks-modules-test` parameter instead of `--name=azks-modules-test` command parameter.
 
-```shell
-make build
-```
+  :warning: Use image's tag according to tag generated in build step.
 
-## Run example
+  This command will create configuration file of AzKS module in /tmp/shared/azks/azks-config.yml. You can investigate what is stored in that file. Available parameters are described in the [inputs](docs/INPUTS.adoc) document.
 
-You can run example of AzBI and AzKS module using files in the `examples` directory.
+  :warning: Pay attention to the docker image tag you are using. Command `make build` command uses a specific version
+  tag (default `epiphanyplatrofm/azks:dev`).
 
-```shell
-cd examples/basic_flow
-ARM_CLIENT_ID="appId field" ARM_CLIENT_SECRET="password field" ARM_SUBSCRIPTION_ID="id field" ARM_TENANT_ID="tenant field" make all
-```
+* Plan and apply AzBI module:
 
-Or use config file with credentials:
+  ```shell
+  docker run --rm -v /tmp/shared:/shared -e SUBSCRIPTION_ID=subscriptionId -e CLIENT_ID=appId -e CLIENT_SECRET=password -e TENANT_ID=tenantId epiphanyplatform/azks:dev plan
+  docker run --rm -v /tmp/shared:/shared -e SUBSCRIPTION_ID=subscriptionId -e CLIENT_ID=appId -e CLIENT_SECRET=password -e TENANT_ID=tenantId epiphanyplatform/azks:dev apply
+  ```
+  :star: Variable values can be passed as docker environment variables. I's often more convenient to pass sensitive values as presented.
 
-```shell
-cd examples/basic_flow
-cat >azure.mk <<'EOF'
-ARM_CLIENT_ID ?= "appId field"
-ARM_CLIENT_SECRET ?= "password field"
-ARM_SUBSCRIPTION_ID ?= "id field"
-ARM_TENANT_ID ?= "tenant field"
-EOF
-make all
-```
+  Running those commands should create AKS cluster in provided RG. You should verify in Azure Portal.
 
-## Run example in existing subnet
+* Destroy module resources:
 
-You can run example of AzKS in existing subnet using files in `examples` directory.
+  ```shell
+  docker run --rm -v /tmp/shared:/shared -e SUBSCRIPTION_ID=subscriptionId -e CLIENT_ID=appId -e CLIENT_SECRET=password -e TENANT_ID=tenantId epiphanyplatform/azks:dev plan --destroy
+  docker run --rm -v /tmp/shared:/shared -e SUBSCRIPTION_ID=subscriptionId -e CLIENT_ID=appId -e CLIENT_SECRET=password -e TENANT_ID=tenantId epiphanyplatform/azks:dev destroy
+  ```
+  :star: Variable values can be passed as docker environment variables. I's often more convenient to pass sensitive values as presented.
 
-```shell
-cd examples/create_in_existing_subnet
-ARM_CLIENT_ID="appId field" ARM_CLIENT_SECRET="password field" ARM_SUBSCRIPTION_ID="id field" ARM_TENANT_ID="tenant field" M_RG_NAME="existing rg name" M_SUBNET_NAME="existing subnet name" M_VNET_NAME="existing vnet name" EXISTING_SUBNET="true" make all
-```
+  :warning: Running those commands will remove AKS resource and all application deployed on it so be careful. You should verify in Azure Portal.
 
-Or use config file with credentials:
+# AzKS output data
 
-```shell
-cd examples/create_in_existing_subnet
-cat >azure.mk <<'EOF'
-ARM_CLIENT_ID ?= "appId field"
-ARM_CLIENT_SECRET ?= "password field"
-ARM_SUBSCRIPTION_ID ?= "id field"
-ARM_TENANT_ID ?= "tenant field"
-M_RG_NAME ?= "existing rg name"
-M_SUBNET_NAME ?= "existing subnet name"
-M_VNET_NAME ?= "existing vnet name"
-EOF
-make apply
-```
+The output from this module is just kubeconfig. To extract it from state one can use [JQ](https://stedolan.github.io/jq) combined with `output` command: `docker run --rm -v $(pwd)/shared:/shared epiphanyplatform/azks:dev output | grep -v DEPRECATION | jq -r '.azks.output.kubeconfig'`. :warning: `grep -v DEPRECATION` part is filtering additional possible notification lines. 
 
-If You want to destroy the AzKS, execute above instruction in the same way using `destroy` command instead of `all`.
+# Examples
 
-## Release module
+For examples running description please have a look into [this document](docs/EXAMPLES.md).
 
-```shell
-make release
-```
+# Development
 
-or if you want to set different version number:
+For development related topics please look into [this document](docs/DEVELOPMENT.md).
 
-```shell
-make release VERSION=number_of_your_choice
-```
+# Azure limits
 
-## Run tests
+There are subscription or regional limits in Azure Cloud. All of them can be investigated [on this site](https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/azure-subscription-service-limits). For this module most important limitation is kubernetes version operating in a region of your choice. To check version `az aks get-versions --location <your region>`. To check your current resources usage please go to Azure Portal > Subscriptions > select subscription > Usage + quotas. 
 
-```
-make test
-```
-
-## Run tests in Kubernetes based build system
-
-Kubernetes based build system means that build agents work inside Kubernetes cluster. During testing process application runs inside docker container. This means that we've got "docker inside docker (DiD)". This kind of environment requires a bit different configuration of mount shared storage to docker container than with standard one-layer configuration.
-
-With DiD configuration shared volume needs to be created on host machine and this volume is shared with application container as Kubernetes volume.
-Configuration steps:
-
-1.  Create volume  (host path). In deployment.yaml add this config to create kubernetes volume:
-
-```
-volumes:
-- name: tests-share
-  hostPath:
-    path: /tmp/tests-share
-```
-
-See manual for more details: https://kubernetes.io/docs/concepts/storage/volumes/#hostpath
-
-2. Add mount point for kubernetes pod (agent). In deployment.yaml add this config to define volume's mount point:
-
-```
-volumeMounts:
-- mountPath: /tests-share
-  name: tests-share
-```
-
-3. Inside pod where tests will run set two variables to indicate host path and mount point:
-
-```
-export K8S_HOST_PATH=/tests-share
-export K8S_VOL_PATH=/tmp/tests-share  ##modify paths according your needs, but they need to match paths from steps 1 and 2.
-```
-
-4. Go to location where you downloaded repository and run:
-
-```
-make test
-```
-
-5. Test results will be availabe inside ```/tests-share``` on pod on which tests are running and is mapped to ```/tmp/tests-share``` on kubernetes node.
-
-## Input parameters
-
-To check supported module parameters list navigate to [inputs](docs/INPUTS.adoc) document.
-
-## Windows users
-
-This module is designed for Linux/Unix development/usage only. If you need to develop from Windows you can use the included [devcontainer setup for VScode](https://code.visualstudio.com/docs/remote/containers-tutorial) and run the examples the same way but then from then ```examples/basic_flow_devcontainer``` folder.
-
-## Module dependencies
+# Module dependencies
 
 | Component                 | Version | Repo/Website                                          | License                                                           |
 | ------------------------- | ------- | ----------------------------------------------------- | ----------------------------------------------------------------- |
 | Terraform                 | 0.13.2  | https://www.terraform.io/                             | [Mozilla Public License 2.0](https://github.com/hashicorp/terraform/blob/master/LICENSE) |
 | Terraform AzureRM provider | 2.27.0 | https://github.com/terraform-providers/terraform-provider-azurerm | [Mozilla Public License 2.0](https://github.com/terraform-providers/terraform-provider-azurerm/blob/master/LICENSE) |
-| Make                      | 4.3     | https://www.gnu.org/software/make/                    | [ GNU General Public License](https://www.gnu.org/licenses/gpl-3.0.html) |
-| yq                        | 3.3.4   | https://github.com/mikefarah/yq/                      | [ MIT License](https://github.com/mikefarah/yq/blob/master/LICENSE) |
