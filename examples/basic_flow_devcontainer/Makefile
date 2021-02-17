@@ -11,6 +11,8 @@ export
 
 .PHONY: all clean init plan apply output destroy-plan destroy setup
 
+#TODO that all needs fixing due to changes in main basic_flow example
+
 all: init plan apply
 
 clean:
@@ -66,4 +68,3 @@ setup: $(M_SHARED)/$(VMS_RSA_FILENAME)
 $(M_SHARED)/$(VMS_RSA_FILENAME):
 	@mkdir -p $(dir $@)
 	@ssh-keygen -t rsa -b 4096 -f $@ -N '' 2>&1 >/dev/null
-
