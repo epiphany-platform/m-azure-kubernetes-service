@@ -97,4 +97,4 @@ jobs:
           script: |
             echo "Removing image"
             echo "---------------------------------------------------------------"
-            docker rmi $(registry_name)/$(IMAGE_REPOSITORY):$(Build.BuildId)
+            docker rmi $(registryName)/$(IMAGE_REPOSITORY):$(Build.BuildId)
