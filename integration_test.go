@@ -112,7 +112,6 @@ func TestInit(t *testing.T) {
     },
     "azure_ad": null,
     "identity_type": "SystemAssigned",
-    "kube_dashboard_enabled": true,
     "admin_username": "operations"
   }
 }`),
@@ -164,7 +163,6 @@ func TestInit(t *testing.T) {
     },
     "azure_ad": null,
     "identity_type": "SystemAssigned",
-    "kube_dashboard_enabled": true,
     "admin_username": "operations"
   }
 }`),
@@ -281,7 +279,6 @@ func TestInit(t *testing.T) {
     },
     "azure_ad": null,
     "identity_type": "SystemAssigned",
-    "kube_dashboard_enabled": true,
     "admin_username": "operations"
   }
 }`),
@@ -403,7 +400,6 @@ func TestInit(t *testing.T) {
     },
     "azure_ad": null,
     "identity_type": "SystemAssigned",
-    "kube_dashboard_enabled": true,
     "admin_username": "operations"
   }
 }`),
@@ -525,7 +521,6 @@ func TestInit(t *testing.T) {
     },
     "azure_ad": null,
     "identity_type": "SystemAssigned",
-    "kube_dashboard_enabled": true,
     "admin_username": "operations"
   }
 }`),
@@ -577,7 +572,6 @@ func TestInit(t *testing.T) {
     },
     "azure_ad": null,
     "identity_type": "SystemAssigned",
-    "kube_dashboard_enabled": true,
     "admin_username": "operations"
   }
 }`),
@@ -629,7 +623,6 @@ func TestInit(t *testing.T) {
     },
     "azure_ad": null,
     "identity_type": "SystemAssigned",
-    "kube_dashboard_enabled": true,
     "admin_username": "operations"
   }
 }`),
@@ -681,7 +674,6 @@ func TestInit(t *testing.T) {
     },
     "azure_ad": null,
     "identity_type": "SystemAssigned",
-    "kube_dashboard_enabled": true,
     "admin_username": "operations"
   }
 }`),
@@ -733,7 +725,6 @@ func TestInit(t *testing.T) {
     },
     "azure_ad": null,
     "identity_type": "SystemAssigned",
-    "kube_dashboard_enabled": true,
     "admin_username": "operations"
   }
 }`),
@@ -785,7 +776,6 @@ func TestInit(t *testing.T) {
     },
     "azure_ad": null,
     "identity_type": "SystemAssigned",
-    "kube_dashboard_enabled": true,
     "admin_username": "operations"
   }
 }`),
@@ -837,7 +827,6 @@ func TestInit(t *testing.T) {
     },
     "azure_ad": null,
     "identity_type": "SystemAssigned",
-    "kube_dashboard_enabled": true,
     "admin_username": "operations"
   }
 }`),
@@ -918,7 +907,6 @@ func TestPlan(t *testing.T) {
     },
     "azure_ad": null,
     "identity_type": "SystemAssigned",
-    "kube_dashboard_enabled": true,
     "admin_username": "operations"
   }
 }`),
@@ -1023,7 +1011,6 @@ func TestApply(t *testing.T) {
     },
     "azure_ad": null,
     "identity_type": "SystemAssigned",
-    "kube_dashboard_enabled": true,
     "admin_username": "operations"
   }
 }`),

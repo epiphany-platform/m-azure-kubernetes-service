@@ -93,11 +93,6 @@ variable "identity_type" {
   default     = "SystemAssigned"
 }
 
-variable "kube_dashboard_enabled" {
-  description = "Whether k8s dashboard is enabled or not"
-  type        = bool
-}
-
 variable "admin_username" {
   description = "Admin user on Linux OS"
   type        = string

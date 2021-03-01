@@ -66,12 +66,6 @@ resource "azurerm_kubernetes_cluster" "aks" {
     }
   }
 
-  addon_profile {
-    kube_dashboard {
-      enabled = var.kube_dashboard_enabled
-    }
-  }
-
   auto_scaler_profile {
     balance_similar_node_groups      = var.auto_scaler_profile.balance_similar_node_groups
     max_graceful_termination_sec     = var.auto_scaler_profile.max_graceful_termination_sec
