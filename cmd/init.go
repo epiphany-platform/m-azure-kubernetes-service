@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
 	"path/filepath"
 	"reflect"
@@ -74,7 +73,7 @@ var initCmd = &cobra.Command{
 
 		if state.GetAzKSState() != nil && !reflect.DeepEqual(state.GetAzKSState(), &st.AzKSState{}) {
 			if state.AzKS.Status != st.Initialized && state.AzKS.Status != st.Destroyed {
-				logger.Fatal().Err(errors.New(string("unexpected state: " + state.AzKS.Status))).Msg("incorrect state")
+				logger.Fatal().Err(fmt.Errorf("unexpected state: %v", state.AzKS.Status)).Msg("incorrect state")
 			}
 		}
 
