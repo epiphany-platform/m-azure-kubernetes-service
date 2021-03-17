@@ -6,6 +6,9 @@ import (
 	"path/filepath"
 	"reflect"
 
+	"github.com/epiphany-platform/e-structures/utils/load"
+	"github.com/epiphany-platform/e-structures/utils/save"
+
 	st "github.com/epiphany-platform/e-structures/state/v0"
 	"github.com/epiphany-platform/e-structures/utils/to"
 	"github.com/spf13/cobra"
@@ -55,12 +58,12 @@ var initCmd = &cobra.Command{
 			logger.Fatal().Err(err).Msg("ensureDirectory failed")
 		}
 		logger.Debug().Msg("load state file")
-		state, err := loadState(stateFilePath)
+		state, err := load.State(stateFilePath)
 		if err != nil {
 			logger.Fatal().Err(err).Msg("loadState failed")
 		}
 		logger.Debug().Msg("load config file")
-		config, err := loadConfig(configFilePath)
+		config, err := load.AzKSConfig(configFilePath)
 		if err != nil {
 			logger.Fatal().Err(err).Msg("loadConfig failed")
 		}
@@ -122,12 +125,12 @@ var initCmd = &cobra.Command{
 		state.AzKS.Status = st.Initialized
 
 		logger.Debug().Msg("save config")
-		err = saveConfig(configFilePath, config)
+		err = save.AzKSConfig(configFilePath, config)
 		if err != nil {
 			logger.Fatal().Err(err).Msg("saveConfig failed")
 		}
 		logger.Debug().Msg("save state")
-		err = saveState(stateFilePath, state)
+		err = save.State(stateFilePath, state)
 		if err != nil {
 			logger.Fatal().Err(err).Msg("saveState failed")
 		}
