@@ -1,10 +1,12 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
 	"path/filepath"
 	"reflect"
+
+	"github.com/epiphany-platform/e-structures/utils/load"
+	"github.com/epiphany-platform/e-structures/utils/save"
 
 	st "github.com/epiphany-platform/e-structures/state/v0"
 	"github.com/epiphany-platform/e-structures/utils/to"
@@ -55,18 +57,24 @@ var initCmd = &cobra.Command{
 			logger.Fatal().Err(err).Msg("ensureDirectory failed")
 		}
 		logger.Debug().Msg("load state file")
-		state, err := loadState(stateFilePath)
+		state, err := load.State(stateFilePath)
 		if err != nil {
 			logger.Fatal().Err(err).Msg("loadState failed")
 		}
 		logger.Debug().Msg("load config file")
-		config, err := loadConfig(configFilePath)
+		config, err := load.AzKSConfig(configFilePath)
 		if err != nil {
 			logger.Fatal().Err(err).Msg("loadConfig failed")
 		}
 
-		if !reflect.DeepEqual(state.AzKS, &st.AzKSState{}) && state.AzKS.Status != st.Initialized && state.AzKS.Status != st.Destroyed {
-			logger.Fatal().Err(errors.New(string("unexpected state: " + state.AzKS.Status))).Msg("incorrect state")
+		if state.GetAzKSState() == nil {
+			state.AzKS = &st.AzKSState{}
+		}
+
+		if state.GetAzKSState() != nil && !reflect.DeepEqual(state.GetAzKSState(), &st.AzKSState{}) {
+			if state.AzKS.Status != st.Initialized && state.AzKS.Status != st.Destroyed {
+				logger.Fatal().Err(fmt.Errorf("unexpected state: %v", state.AzKS.Status)).Msg("incorrect state")
+			}
 		}
 
 		logger.Debug().Msg("backup state file")
@@ -89,45 +97,48 @@ var initCmd = &cobra.Command{
 
 		//initialize configuration using values from AzBIState
 		if !omitState {
-			if state.GetAzBIState().Status == st.Applied {
-				if state.GetAzBIState().GetConfig().GetParams().GetNameV() != "" {
-					config.GetParams().Name = to.StrPtr(state.GetAzBIState().GetConfig().GetParams().GetNameV())
-					fmt.Println("Found and used 'name' parameter in existing AzBI configuration.")
-				}
-				if state.GetAzBIState().GetConfig().GetParams().GetRsaPublicKeyV() != "" {
-					config.GetParams().RsaPublicKeyPath = to.StrPtr(state.GetAzBIState().GetConfig().GetParams().GetRsaPublicKeyV())
-					fmt.Println("Found and used 'vms_rsa' parameter in existing AzBI configuration.")
-				}
-				if state.GetAzBIState().GetConfig().GetParams().GetLocationV() != "" {
-					config.GetParams().Location = to.StrPtr(state.GetAzBIState().GetConfig().GetParams().GetLocationV())
-					fmt.Println("Found and used 'location' parameter in existing AzBI configuration.")
-				}
-				if state.GetAzBIState().GetOutput().GetRgNameV() != "" {
-					config.GetParams().RgName = to.StrPtr(state.GetAzBIState().GetOutput().GetRgNameV())
-					fmt.Println("Found and used 'rg_name' parameter in existing AzBI output.")
-				}
-				if state.GetAzBIState().GetOutput().GetVnetNameV() != "" {
-					config.GetParams().VnetName = to.StrPtr(state.GetAzBIState().GetOutput().GetVnetNameV())
-					fmt.Println("Found and used 'vnet_name' parameter in existing AzBI output.")
-				}
-				for _, s := range state.GetAzBIState().GetConfig().GetParams().ExtractEmptySubnets() {
-					if *s.Name == "azks" || *s.Name == "kubernetes" || *s.Name == "aks" {
-						config.GetParams().SubnetName = s.Name
-						fmt.Println("Found and used 'subnet.name' parameter in existing AzBI configuration.")
+			if state.GetAzBIState() != nil && !reflect.DeepEqual(state.GetAzBIState(), &st.AzBIState{}) {
+				if state.GetAzBIState().Status == st.Applied {
+					if state.GetAzBIState().GetConfig().GetParams().GetNameV() != "" {
+						config.GetParams().Name = to.StrPtr(state.GetAzBIState().GetConfig().GetParams().GetNameV())
+						fmt.Println("Found and used 'name' parameter in existing AzBI configuration.")
+					}
+					if state.GetAzBIState().GetConfig().GetParams().GetRsaPublicKeyV() != "" {
+						config.GetParams().RsaPublicKeyPath = to.StrPtr(state.GetAzBIState().GetConfig().GetParams().GetRsaPublicKeyV())
+						fmt.Println("Found and used 'vms_rsa' parameter in existing AzBI configuration.")
+					}
+					if state.GetAzBIState().GetConfig().GetParams().GetLocationV() != "" {
+						config.GetParams().Location = to.StrPtr(state.GetAzBIState().GetConfig().GetParams().GetLocationV())
+						fmt.Println("Found and used 'location' parameter in existing AzBI configuration.")
+					}
+					if state.GetAzBIState().GetOutput().GetRgNameV() != "" {
+						config.GetParams().RgName = to.StrPtr(state.GetAzBIState().GetOutput().GetRgNameV())
+						fmt.Println("Found and used 'rg_name' parameter in existing AzBI output.")
+					}
+					if state.GetAzBIState().GetOutput().GetVnetNameV() != "" {
+						config.GetParams().VnetName = to.StrPtr(state.GetAzBIState().GetOutput().GetVnetNameV())
+						fmt.Println("Found and used 'vnet_name' parameter in existing AzBI output.")
+					}
+					for _, s := range state.GetAzBIState().GetConfig().GetParams().ExtractEmptySubnets() {
+						if *s.Name == "azks" || *s.Name == "kubernetes" || *s.Name == "aks" {
+							config.GetParams().SubnetName = s.Name
+							fmt.Println("Found and used 'subnet.name' parameter in existing AzBI configuration.")
+						}
 					}
 				}
 			}
 		}
 
 		state.AzKS.Status = st.Initialized
+		state.AzKS.Config = config
 
 		logger.Debug().Msg("save config")
-		err = saveConfig(configFilePath, config)
+		err = save.AzKSConfig(configFilePath, config)
 		if err != nil {
 			logger.Fatal().Err(err).Msg("saveConfig failed")
 		}
 		logger.Debug().Msg("save state")
-		err = saveState(stateFilePath, state)
+		err = save.State(stateFilePath, state)
 		if err != nil {
 			logger.Fatal().Err(err).Msg("saveState failed")
 		}
@@ -136,7 +147,7 @@ var initCmd = &cobra.Command{
 		if err != nil {
 			logger.Fatal().Err(err).Msg("config.Marshal failed")
 		}
-		logger.Info().Msg(string(bytes))
+		logger.Debug().Msg(string(bytes))
 		fmt.Println("Initialized config: \n" + string(bytes))
 	},
 }

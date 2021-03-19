@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"path/filepath"
 
+	"github.com/epiphany-platform/e-structures/utils/save"
+
 	st "github.com/epiphany-platform/e-structures/state/v0"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -78,7 +80,7 @@ This command should always be preceded by 'plan' command.`,
 		state.AzKS.Output = produceOutput(terraformOutputMap)
 
 		logger.Debug().Msg("save state")
-		err = saveState(stateFilePath, state)
+		err = save.State(stateFilePath, state)
 		if err != nil {
 			logger.Fatal().Err(err).Msg("saveState failed")
 		}

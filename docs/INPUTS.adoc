@@ -41,7 +41,7 @@ Following table presents parameters which can be passed as command parameters (`
 
 |omit_state |bool |false |no |init |omit state values during initialization
 
-|debug |bool |false |no |all |prints additional debug information
+|loglevel |string |info |no |all |Log level flag [panic/fatal/error/warn/debug/trace]
 
 |===
 
@@ -91,7 +91,6 @@ Only fields that should not be modified are "kind" and "version" fields. All oth
 		},
 		"azure_ad": null,
 		"identity_type": "SystemAssigned",
-		"kube_dashboard_enabled": true,
 		"admin_username": "operations"
 	}
 }

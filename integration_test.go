@@ -79,7 +79,7 @@ func TestInit(t *testing.T) {
 			initParams:           nil,
 			wantConfigContent: []byte(`{
   "kind": "azks",
-  "version": "v0.0.1",
+  "version": "v0.0.3",
   "params": {
     "name": "epiphany",
     "location": "northeurope",
@@ -95,7 +95,7 @@ func TestInit(t *testing.T) {
       "min": 2,
       "max": 5,
       "vm_size": "Standard_DS2_v2",
-      "disk_size": "36",
+      "disk_gb_size": 36,
       "auto_scaling": true,
       "type": "VirtualMachineScaleSets"
     },
@@ -112,7 +112,6 @@ func TestInit(t *testing.T) {
     },
     "azure_ad": null,
     "identity_type": "SystemAssigned",
-    "kube_dashboard_enabled": true,
     "admin_username": "operations"
   }
 }`),
@@ -131,7 +130,7 @@ func TestInit(t *testing.T) {
 			initParams: nil,
 			wantConfigContent: []byte(`{
   "kind": "azks",
-  "version": "v0.0.1",
+  "version": "v0.0.3",
   "params": {
     "name": "epiphany",
     "location": "northeurope",
@@ -147,7 +146,7 @@ func TestInit(t *testing.T) {
       "min": 2,
       "max": 5,
       "vm_size": "Standard_DS2_v2",
-      "disk_size": "36",
+      "disk_gb_size": 36,
       "auto_scaling": true,
       "type": "VirtualMachineScaleSets"
     },
@@ -164,7 +163,6 @@ func TestInit(t *testing.T) {
     },
     "azure_ad": null,
     "identity_type": "SystemAssigned",
-    "kube_dashboard_enabled": true,
     "admin_username": "operations"
   }
 }`),
@@ -248,7 +246,7 @@ func TestInit(t *testing.T) {
 			initParams: nil,
 			wantConfigContent: []byte(`{
   "kind": "azks",
-  "version": "v0.0.1",
+  "version": "v0.0.3",
   "params": {
     "name": "some-test-name",
     "location": "northeurope",
@@ -264,7 +262,7 @@ func TestInit(t *testing.T) {
       "min": 2,
       "max": 5,
       "vm_size": "Standard_DS2_v2",
-      "disk_size": "36",
+      "disk_gb_size": 36,
       "auto_scaling": true,
       "type": "VirtualMachineScaleSets"
     },
@@ -281,7 +279,6 @@ func TestInit(t *testing.T) {
     },
     "azure_ad": null,
     "identity_type": "SystemAssigned",
-    "kube_dashboard_enabled": true,
     "admin_username": "operations"
   }
 }`),
@@ -370,7 +367,7 @@ func TestInit(t *testing.T) {
 			initParams: nil,
 			wantConfigContent: []byte(`{
   "kind": "azks",
-  "version": "v0.0.1",
+  "version": "v0.0.3",
   "params": {
     "name": "some-test-name",
     "location": "northeurope",
@@ -386,7 +383,7 @@ func TestInit(t *testing.T) {
       "min": 2,
       "max": 5,
       "vm_size": "Standard_DS2_v2",
-      "disk_size": "36",
+      "disk_gb_size": 36,
       "auto_scaling": true,
       "type": "VirtualMachineScaleSets"
     },
@@ -403,7 +400,6 @@ func TestInit(t *testing.T) {
     },
     "azure_ad": null,
     "identity_type": "SystemAssigned",
-    "kube_dashboard_enabled": true,
     "admin_username": "operations"
   }
 }`),
@@ -492,7 +488,7 @@ func TestInit(t *testing.T) {
 			initParams: map[string]string{"--omit_state": "true"},
 			wantConfigContent: []byte(`{
   "kind": "azks",
-  "version": "v0.0.1",
+  "version": "v0.0.3",
   "params": {
     "name": "epiphany",
     "location": "northeurope",
@@ -508,7 +504,7 @@ func TestInit(t *testing.T) {
       "min": 2,
       "max": 5,
       "vm_size": "Standard_DS2_v2",
-      "disk_size": "36",
+      "disk_gb_size": 36,
       "auto_scaling": true,
       "type": "VirtualMachineScaleSets"
     },
@@ -525,7 +521,6 @@ func TestInit(t *testing.T) {
     },
     "azure_ad": null,
     "identity_type": "SystemAssigned",
-    "kube_dashboard_enabled": true,
     "admin_username": "operations"
   }
 }`),
@@ -544,7 +539,7 @@ func TestInit(t *testing.T) {
 			initParams: map[string]string{"--name": "name-test-1"},
 			wantConfigContent: []byte(`{
   "kind": "azks",
-  "version": "v0.0.1",
+  "version": "v0.0.3",
   "params": {
     "name": "name-test-1",
     "location": "northeurope",
@@ -560,7 +555,7 @@ func TestInit(t *testing.T) {
       "min": 2,
       "max": 5,
       "vm_size": "Standard_DS2_v2",
-      "disk_size": "36",
+      "disk_gb_size": 36,
       "auto_scaling": true,
       "type": "VirtualMachineScaleSets"
     },
@@ -577,7 +572,6 @@ func TestInit(t *testing.T) {
     },
     "azure_ad": null,
     "identity_type": "SystemAssigned",
-    "kube_dashboard_enabled": true,
     "admin_username": "operations"
   }
 }`),
@@ -596,7 +590,7 @@ func TestInit(t *testing.T) {
 			initParams: map[string]string{"--kubernetes_version": "1.2.3"},
 			wantConfigContent: []byte(`{
   "kind": "azks",
-  "version": "v0.0.1",
+  "version": "v0.0.3",
   "params": {
     "name": "epiphany",
     "location": "northeurope",
@@ -612,7 +606,7 @@ func TestInit(t *testing.T) {
       "min": 2,
       "max": 5,
       "vm_size": "Standard_DS2_v2",
-      "disk_size": "36",
+      "disk_gb_size": 36,
       "auto_scaling": true,
       "type": "VirtualMachineScaleSets"
     },
@@ -629,7 +623,6 @@ func TestInit(t *testing.T) {
     },
     "azure_ad": null,
     "identity_type": "SystemAssigned",
-    "kube_dashboard_enabled": true,
     "admin_username": "operations"
   }
 }`),
@@ -648,7 +641,7 @@ func TestInit(t *testing.T) {
 			initParams: map[string]string{"--rg_name": "rg-name-test-1"},
 			wantConfigContent: []byte(`{
   "kind": "azks",
-  "version": "v0.0.1",
+  "version": "v0.0.3",
   "params": {
     "name": "epiphany",
     "location": "northeurope",
@@ -664,7 +657,7 @@ func TestInit(t *testing.T) {
       "min": 2,
       "max": 5,
       "vm_size": "Standard_DS2_v2",
-      "disk_size": "36",
+      "disk_gb_size": 36,
       "auto_scaling": true,
       "type": "VirtualMachineScaleSets"
     },
@@ -681,7 +674,6 @@ func TestInit(t *testing.T) {
     },
     "azure_ad": null,
     "identity_type": "SystemAssigned",
-    "kube_dashboard_enabled": true,
     "admin_username": "operations"
   }
 }`),
@@ -700,7 +692,7 @@ func TestInit(t *testing.T) {
 			initParams: map[string]string{"--subnet_name": "subnet-name-test-1"},
 			wantConfigContent: []byte(`{
   "kind": "azks",
-  "version": "v0.0.1",
+  "version": "v0.0.3",
   "params": {
     "name": "epiphany",
     "location": "northeurope",
@@ -716,7 +708,7 @@ func TestInit(t *testing.T) {
       "min": 2,
       "max": 5,
       "vm_size": "Standard_DS2_v2",
-      "disk_size": "36",
+      "disk_gb_size": 36,
       "auto_scaling": true,
       "type": "VirtualMachineScaleSets"
     },
@@ -733,7 +725,6 @@ func TestInit(t *testing.T) {
     },
     "azure_ad": null,
     "identity_type": "SystemAssigned",
-    "kube_dashboard_enabled": true,
     "admin_username": "operations"
   }
 }`),
@@ -752,7 +743,7 @@ func TestInit(t *testing.T) {
 			initParams: map[string]string{"--vnet_name": "vnet-name-test-1"},
 			wantConfigContent: []byte(`{
   "kind": "azks",
-  "version": "v0.0.1",
+  "version": "v0.0.3",
   "params": {
     "name": "epiphany",
     "location": "northeurope",
@@ -768,7 +759,7 @@ func TestInit(t *testing.T) {
       "min": 2,
       "max": 5,
       "vm_size": "Standard_DS2_v2",
-      "disk_size": "36",
+      "disk_gb_size": 36,
       "auto_scaling": true,
       "type": "VirtualMachineScaleSets"
     },
@@ -785,7 +776,6 @@ func TestInit(t *testing.T) {
     },
     "azure_ad": null,
     "identity_type": "SystemAssigned",
-    "kube_dashboard_enabled": true,
     "admin_username": "operations"
   }
 }`),
@@ -804,7 +794,7 @@ func TestInit(t *testing.T) {
 			initParams: map[string]string{"--vms_rsa": "test_rsa"},
 			wantConfigContent: []byte(`{
   "kind": "azks",
-  "version": "v0.0.1",
+  "version": "v0.0.3",
   "params": {
     "name": "epiphany",
     "location": "northeurope",
@@ -820,7 +810,7 @@ func TestInit(t *testing.T) {
       "min": 2,
       "max": 5,
       "vm_size": "Standard_DS2_v2",
-      "disk_size": "36",
+      "disk_gb_size": 36,
       "auto_scaling": true,
       "type": "VirtualMachineScaleSets"
     },
@@ -837,7 +827,6 @@ func TestInit(t *testing.T) {
     },
     "azure_ad": null,
     "identity_type": "SystemAssigned",
-    "kube_dashboard_enabled": true,
     "admin_username": "operations"
   }
 }`),
@@ -885,7 +874,7 @@ func TestPlan(t *testing.T) {
 			name: "initialized without any prior steps",
 			existingConfigContent: []byte(`{
   "kind": "azks",
-  "version": "v0.0.1",
+  "version": "v0.0.3",
   "params": {
     "name": "azks-integration-test",
     "location": "northeurope",
@@ -901,7 +890,7 @@ func TestPlan(t *testing.T) {
       "min": 2,
       "max": 5,
       "vm_size": "Standard_DS2_v2",
-      "disk_size": "36",
+      "disk_gb_size": 36,
       "auto_scaling": true,
       "type": "VirtualMachineScaleSets"
     },
@@ -918,11 +907,10 @@ func TestPlan(t *testing.T) {
     },
     "azure_ad": null,
     "identity_type": "SystemAssigned",
-    "kube_dashboard_enabled": true,
     "admin_username": "operations"
   }
 }`),
-			planParams:             map[string]string{"--debug": "true"},
+			planParams:             map[string]string{"--loglevel": "debug"},
 			wantPlanOutputLastLine: "\tAdd: 1, Change: 0, Destroy: 0",
 		},
 	}
@@ -952,7 +940,7 @@ func TestPlan(t *testing.T) {
 	"kind": "state",
 	"version": "v0.0.3",
 	"azbi": {
-		"status": "",
+		"status": "initialized",
 		"config": null,
 		"output": null
 	},
@@ -990,7 +978,7 @@ func TestApply(t *testing.T) {
 			name: "initialized without any prior steps",
 			existingConfigContent: []byte(`{
   "kind": "azks",
-  "version": "v0.0.1",
+  "version": "v0.0.3",
   "params": {
     "name": "azks-integration-test",
     "location": "northeurope",
@@ -1006,7 +994,7 @@ func TestApply(t *testing.T) {
       "min": 2,
       "max": 5,
       "vm_size": "Standard_DS2_v2",
-      "disk_size": "36",
+      "disk_gb_size": 36,
       "auto_scaling": true,
       "type": "VirtualMachineScaleSets"
     },
@@ -1023,13 +1011,12 @@ func TestApply(t *testing.T) {
     },
     "azure_ad": null,
     "identity_type": "SystemAssigned",
-    "kube_dashboard_enabled": true,
     "admin_username": "operations"
   }
 }`),
-			planParams:              map[string]string{"--debug": "true"},
+			planParams:              map[string]string{"--loglevel": "debug"},
 			wantPlanOutputLastLine:  "\tAdd: 1, Change: 0, Destroy: 0",
-			applyParams:             map[string]string{"--debug": "true"},
+			applyParams:             map[string]string{"--loglevel": "debug"},
 			wantApplyOutputLastLine: "\tAdd: 1, Change: 0, Destroy: 0",
 		},
 	}
@@ -1060,7 +1047,7 @@ func TestApply(t *testing.T) {
 	"kind": "state",
 	"version": "v0.0.3",
 	"azbi": {
-		"status": "",
+		"status": "initialized",
 		"config": null,
 		"output": null
 	},
