@@ -27,7 +27,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
     vm_size               = var.default_node_pool.vm_size
     vnet_subnet_id        = data.azurerm_subnet.subnet.id
     orchestrator_version  = var.kubernetes_version
-    os_disk_size_gb       = var.default_node_pool.disk_size
+    os_disk_size_gb       = var.default_node_pool.disk_gb_size
     enable_node_public_ip = var.enable_node_public_ip
     type                  = var.default_node_pool.type
     enable_auto_scaling   = var.default_node_pool.auto_scaling
@@ -63,12 +63,6 @@ resource "azurerm_kubernetes_cluster" "aks" {
         tenant_id              = azure_active_directory.tenant_id
         admin_group_object_ids = azure_active_directory.admin_group_object_ids
       }
-    }
-  }
-
-  addon_profile {
-    kube_dashboard {
-      enabled = var.kube_dashboard_enabled
     }
   }
 
