@@ -14,8 +14,8 @@ variable "vnet_name" {
 }
 
 variable "subnet_name" {
-	description = "Name of the existing subnet to deploy AKS cluster in"
-	type        = string
+  description = "Name of the existing subnet to deploy AKS cluster in"
+  type        = string
 }
 
 variable "rsa_pub_path" {
@@ -52,12 +52,12 @@ variable "enable_rbac" {
 
 variable "default_node_pool" {
   description = "Default node pool for AKS"
-  type = object({
+  type        = object({
     size         = number
     min          = number
     max          = number
     vm_size      = string
-    disk_size    = string
+    disk_gb_size = string
     auto_scaling = bool
     type         = string
   })
@@ -65,22 +65,22 @@ variable "default_node_pool" {
 
 variable "auto_scaler_profile" {
   description = "Auto scaler profile"
-  type = object({
-    balance_similar_node_groups       = bool
-    max_graceful_termination_sec      = string
-    scale_down_delay_after_add        = string
-    scale_down_delay_after_delete     = string
-    scale_down_delay_after_failure    = string
-    scan_interval                     = string
-    scale_down_unneeded               = string
-    scale_down_unready                = string
-    scale_down_utilization_threshold  = string
+  type        = object({
+    balance_similar_node_groups      = bool
+    max_graceful_termination_sec     = string
+    scale_down_delay_after_add       = string
+    scale_down_delay_after_delete    = string
+    scale_down_delay_after_failure   = string
+    scan_interval                    = string
+    scale_down_unneeded              = string
+    scale_down_unready               = string
+    scale_down_utilization_threshold = string
   })
 }
 
 variable "azure_ad" {
   description = "Azure Active Directory settings"
-  type = object({
+  type        = object({
     managed                = bool
     tenant_id              = string
     admin_group_object_ids = list(string)
@@ -91,11 +91,6 @@ variable "identity_type" {
   description = "The type of identity used for the managed cluster"
   type        = string
   default     = "SystemAssigned"
-}
-
-variable "kube_dashboard_enabled" {
-  description = "Whether k8s dashboard is enabled or not"
-  type        = bool
 }
 
 variable "admin_username" {

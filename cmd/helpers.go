@@ -5,6 +5,8 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/epiphany-platform/e-structures/utils/load"
+
 	azks "github.com/epiphany-platform/e-structures/azks/v0"
 	st "github.com/epiphany-platform/e-structures/state/v0"
 	"github.com/epiphany-platform/e-structures/utils/to"
@@ -12,69 +14,6 @@ import (
 
 func ensureDirectory(path string) error {
 	err := os.MkdirAll(path, os.ModePerm)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func loadState(path string) (*st.State, error) {
-	logger.Debug().Msgf("loadState(%s)", path)
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		return st.NewState(), nil
-	} else {
-		state := &st.State{}
-		bytes, err := ioutil.ReadFile(path)
-		if err != nil {
-			return nil, err
-		}
-		err = state.Unmarshal(bytes)
-		if err != nil {
-			return nil, err
-		}
-		if state.AzKS == nil {
-			state.AzKS = &st.AzKSState{}
-		}
-		return state, nil
-	}
-}
-
-func saveState(path string, state *st.State) error {
-	bytes, err := state.Marshal()
-	if err != nil {
-		return err
-	}
-	err = ioutil.WriteFile(path, bytes, 0644)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func loadConfig(path string) (*azks.Config, error) {
-	logger.Debug().Msgf("loadConfig(%s)", path)
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		return azks.NewConfig(), nil
-	} else {
-		config := &azks.Config{}
-		bytes, err := ioutil.ReadFile(path)
-		if err != nil {
-			return nil, err
-		}
-		err = config.Unmarshal(bytes)
-		if err != nil {
-			return nil, err
-		}
-		return config, nil
-	}
-}
-
-func saveConfig(path string, config *azks.Config) error {
-	bytes, err := config.Marshal()
-	if err != nil {
-		return err
-	}
-	err = ioutil.WriteFile(path, bytes, 0644)
 	if err != nil {
 		return err
 	}
@@ -110,12 +49,12 @@ func checkAndLoad(stateFilePath string, configFilePath string) (*azks.Config, *s
 		return nil, nil, errors.New("config file does not exist, please run init first")
 	}
 
-	state, err := loadState(stateFilePath)
+	state, err := load.State(stateFilePath)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	config, err := loadConfig(configFilePath)
+	config, err := load.AzKSConfig(configFilePath)
 	if err != nil {
 		return nil, nil, err
 	}

@@ -91,7 +91,6 @@ Only fields that should not be modified are "kind" and "version" fields. All oth
 		},
 		"azure_ad": null,
 		"identity_type": "SystemAssigned",
-		"kube_dashboard_enabled": true,
 		"admin_username": "operations"
 	}
 }
