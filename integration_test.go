@@ -910,7 +910,7 @@ func TestPlan(t *testing.T) {
     "admin_username": "operations"
   }
 }`),
-			planParams:             map[string]string{"--debug": "true"},
+			planParams:             map[string]string{"--loglevel": "debug"},
 			wantPlanOutputLastLine: "\tAdd: 1, Change: 0, Destroy: 0",
 		},
 	}
@@ -1014,9 +1014,9 @@ func TestApply(t *testing.T) {
     "admin_username": "operations"
   }
 }`),
-			planParams:              map[string]string{"--debug": "true"},
+			planParams:              map[string]string{"--loglevel": "debug"},
 			wantPlanOutputLastLine:  "\tAdd: 1, Change: 0, Destroy: 0",
-			applyParams:             map[string]string{"--debug": "true"},
+			applyParams:             map[string]string{"--loglevel": "debug"},
 			wantApplyOutputLastLine: "\tAdd: 1, Change: 0, Destroy: 0",
 		},
 	}
