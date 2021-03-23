@@ -1,10 +1,8 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
 	"path/filepath"
-	"reflect"
 
 	"github.com/epiphany-platform/e-structures/utils/save"
 
@@ -51,13 +49,11 @@ This command should always be preceded by 'plan' command.`,
 			logger.Fatal().Err(err).Msg("checkAndLoad failed")
 		}
 
-		// TODO implement "IsApplicable" in e-structures
-		if !reflect.DeepEqual(state.AzKS, &st.AzKSState{}) && state.AzKS.Status != st.Initialized && state.AzKS.Status != st.Destroyed {
-			logger.Fatal().Err(errors.New(string("unexpected state: " + state.AzKS.Status))).Msg("incorrect state")
+		if state.GetAzKSState() == nil {
+			logger.Fatal().Msg("please run init and plan first")
 		}
 
 		// TODO check if there is terraform plan file present
-
 		err = showModulePlan(config, state)
 		if err != nil {
 			logger.Fatal().Err(err).Msg("showModulePlan failed")
